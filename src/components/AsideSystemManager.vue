@@ -1,11 +1,11 @@
 <template>
     <el-menu
-            style="width: 200px; min-height: calc(100vh - 50px) "
-            :default-active="$route.path"
-            router
-            class="el-menu-vertical-demo">
+        style="width: 200px; min-height: calc(100vh - 50px) "
+        :default-active="$route.path"
+        router
+        class="el-menu-vertical-demo">
         <el-menu-item index="/home">
-            <el-icon><location /></el-icon>
+            <el-icon><icon-menu /></el-icon>
             <span>首页</span>
         </el-menu-item>
         <el-menu-item index="/working-schedule">
@@ -21,11 +21,11 @@
             <span>咨询师管理</span>
         </el-menu-item>
         <el-menu-item index="/visitor-management">
-            <el-icon><van /></el-icon>
+            <el-icon><icon-menu /></el-icon>
             <span>访客管理</span>
         </el-menu-item>
         <el-menu-item index="/supervisor-management">
-            <el-icon><van /></el-icon>
+            <el-icon><icon-menu /></el-icon>
             <span>督导管理</span>
         </el-menu-item>
         <el-menu-item index="/userspace">
@@ -37,26 +37,27 @@
 <script>
 
 import {
-    Location,
-    Document,
     Menu as IconMenu,
     Setting,
-    Van,
+    ArrowDown ,
+
 } from '@element-plus/icons'
 
 export default {
     name:"AsideSystemManager",
     data(){
         return{
-
+            //names: "Wangwenhai"
         }
     },
+    mounted() {
+        document.title='心声谷'
+    },
     components: {
-        Location,
-        Document,
         Setting,
+        ArrowDown ,
         IconMenu,
-        Van,
+
     },
 
 }

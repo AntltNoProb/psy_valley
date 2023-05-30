@@ -1,11 +1,15 @@
 <template>
     <div>
         <!--头部-->
-        <Header/>
+        <Header>
+            <VueHeader/>
+        </Header>
         <!--主体-->
         <div style="display: flex">
+            <AsideConsultant/>
+<!--            <AsideSupervisors/>-->
             <!--侧边栏 确认用户的权限已给出对应-->
-            <AsideSystemManager/>
+<!--            <AsideSystemManager/>-->
 <!--            <AsideAdmin v-if="user.authority === 'admin'" />-->
 <!--            <AsideUser v-if="user.authority === 'user'" />-->
 <!--            <AsideDriver v-if="user.authority === 'employee'" />-->
@@ -16,20 +20,18 @@
 </template>
 
 <script>
-import VueHeader from "@/components/VueHeader.vue";
 import AsideSystemManager from "@/components/AsideSystemManager.vue";
-// import AsideAdmin from "../components/AsideAdmin";
-// import AsideUser from "../components/AsideUser";
-// import AsideDriver from "../components/AsideDriver";
-
+import VueHeader from "@/components/VueHeader.vue"
+import AsideSupervisors from "@/components/AsideSupervisors.vue";
+import AsideConsultant from "@/components/AsideConsultant.vue";
 export default {
     name: "VueLayout",
     components:{
+        AsideConsultant,
+        AsideSupervisors,
         AsideSystemManager,
         VueHeader,
-        // AsideAdmin,
-        // AsideUser,
-        // AsideDriver
+
     },
     data(){
         return{

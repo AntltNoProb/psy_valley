@@ -1,20 +1,32 @@
 <template>
     <div style="padding: 10px">
-        <!--    功能区域-->
-        <div style="margin: 10px 0">
-            <el-button type="primary" @click="add">新增</el-button><!--要在下面添加方法-->
-            <el-popconfirm title="确认要全部导出吗?" @confirm="deleteAll">
-                <template #reference>
-                    <el-button type="danger">全部导出</el-button>
-                </template>
-            </el-popconfirm>
-        </div>
+
         <!--    搜索区域-->
         <div style="margin: 10px 0">
             <el-input v-model="search" placeholder="请输入访客姓名"  style="width: 20%" clearable />
             <el-button type="primary" style="margin-left: 7px" @click="load">查询访客姓名</el-button>
-            <el-input v-model="search" placeholder="请输入咨询师姓名"  style="width: 20%" clearable />
+
+            <el-input v-model="search"  placeholder="请输入咨询师姓名"  style="width: 20%" clearable />
             <el-button type="primary" style="margin-left: 7px" @click="load">查询咨询师姓名</el-button>
+
+            <el-config-provider :locale="locale" >
+                <el-date-picker
+                    style="margin-left: 7px"
+                    v-model="params.date"
+                    type="daterange"
+                    placeholder="选择日期"
+                    format="YYYY/MM/DD"
+                    value-format="YYYY-MM-DD"
+                    start-placeholder="开始日期"
+                    end-placeholder="结束日期"
+                />
+            </el-config-provider>
+
+            <el-popconfirm title="确认要全部导出吗?" @confirm="deleteAll">
+                <template #reference>
+                    <el-button type="danger" style="float:right">全部导出咨询记录</el-button>
+                </template>
+            </el-popconfirm>
         </div>
 
         <el-table :data="tableData" border stripe style="width: 100%" @selection-change="handleSelectionChange">
@@ -29,7 +41,7 @@
                     <el-button type="primary" @click="add">查看详情</el-button>
                     <el-popconfirm title="确认要导出吗?" @confirm="HandleDelete(scope.row.id)">
                         <template #reference>
-                            <el-button size="mini">Delete</el-button>
+                            <el-button size="mini">导出</el-button>
                         </template>
                     </el-popconfirm>
                 </template>
@@ -63,6 +75,11 @@ export default {
     },
     data() {
         return {
+            params: {
+                startTime: '',
+                endTime: '',
+                date: ''
+            },
             form:{},
             dialogVisible:false,
             dialogForCar:false,

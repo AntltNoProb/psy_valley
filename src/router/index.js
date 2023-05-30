@@ -11,7 +11,6 @@ const routes = [
                  name: 'home',
                  component: () => import('@/views/Home.vue'),
              },
-
              {path: 'consult-record',
                 name: 'consult-record',
                 component: ()=>import('@/views/ConsultRecord.vue'),
@@ -19,7 +18,35 @@ const routes = [
                     //         roles: ['admin']
                 },
             },
-            /*
+            {path: 'dialog-record',
+                name: 'dialog-record',
+                component: ()=>import('@/views/DialogRecord.vue'),
+                meta: {
+                    //         roles: ['admin']
+                },
+            },
+            {path: 'supervisor-management',
+                name: 'supervisor-management',
+                component: ()=>import('@/views/SupervisorManagement.vue'),
+                meta: {
+                    //         roles: ['user']
+                },
+            },
+            {path: 'visitor-management',
+                name: 'visitor-management',
+                component: ()=>import('@/views/VisitorManagement.vue'),
+                meta: {
+                    //         roles: ['employee']
+                },
+            },
+            {path: 'counselor-management',
+                name: 'counselor-management',
+                component: ()=>import('@/views/CounselorManagement.vue'),
+                meta: {
+                    //         roles: ['admin']
+                },
+            },
+
              {path: 'userspace',
                  name: 'userspace',
                  component: () => import('@/views/UserSpace.vue'),
@@ -27,44 +54,19 @@ const routes = [
                     // roles: ['admin', 'user','employee']
                  },
              },
-
-
-             {path: 'working-schedule',
-                 name: 'working-schedule',
-                 component: () => import('@/views/WorkingSchedule.vue'),
-                 meta: {
-             //        roles: ['admin']
-                 },
-             },
-
-             {path: 'counselor-management',
-                 name: 'counselor-management',
-                 component: ()=>import('@/views/CounselorManagement.vue'),
-                 meta: {
-            //         roles: ['admin']
-                 },
-             },
-             {path: 'visitor-management',
-                 name: 'visitor-management',
-                 component: ()=>import('@/views/VisitorManagement.vue'),
-                 meta: {
-            //         roles: ['employee']
-                 },
-             },
-             {path: 'supervisor-management',
-                 name: 'supervisor-management',
-                 component: ()=>import('@/views/SupervisorManagement.vue'),
-                 meta: {
-            //         roles: ['user']
-                 },
-             },*/
+            {path: 'working-schedule',
+                name: 'working-schedule',
+                component: () => import('@/views/WorkingSchedule.vue'),
+                meta: {
+                    // roles: ['admin', 'user','employee']
+                },
+            },
         ]
     },
     {path: '/login', name: 'login', component: ()=>import('@/views/Login.vue')}
 ]
 
 const router = createRouter({
-
     history: createWebHistory(),
     routes
 })

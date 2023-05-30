@@ -1,15 +1,13 @@
 <template>
-    <div style="height: 50px; line-height: 50px;border-bottom: 1px solid #ccc; display: flex">
-        <div style ="width: 200px; padding-left: 30px;font-weight: bolder; color: dodgerblue">心声谷</div>
-        <div style ="flex: 1"></div>
-        <div style="width: 100px">
-            <el-dropdown>
-<!--         <span class="el-dropdown-link">-->
-<!--         {{names}}-->
-<!--           <el-icon class="el-icon&#45;&#45;right">-->
-<!--             <arrow-down />-->
-<!--           </el-icon>-->
-<!--         </span>-->
+    <el-container class="home-container">
+        <el-header><!-- 头部区 -->
+            <div>
+                <span>心声谷</span>
+            </div>
+            <el-dropdown >
+                <span class="el-dropdown-link">
+                    {{names}} <el-icon class="el-icon--right"><arrow-down/></el-icon>
+                </span>
                 <template #dropdown>
                     <el-dropdown-menu>
                         <el-dropdown-item @click="$router.push('/userspace')">个人信息</el-dropdown-item>
@@ -17,54 +15,63 @@
                     </el-dropdown-menu>
                 </template>
             </el-dropdown>
-        </div>
-    </div>
+        </el-header>
+    </el-container>
 </template>
 
+
 <script>
-import { ArrowDown } from "@element-plus/icons";
-//import request from "../utils/request";
+import {ArrowDown} from "@element-plus/icons";
 
 export default {
     name: "VueHeader",
-    props: ['user'],
-    components: {
-        ArrowDown ,
-    },
+
     data(){
         return{
-        //     user:{},
-        //     names:"okok",
-        //     userStr:"",
+            names: "Wangwenhai",
+            //user:{}
         }
     },
-    created() {
-        // //这一段代码比较重要，是通过token去后端请求其user信息
-        // this.userStr = localStorage.getItem('Authorization')
-        // let userinfo = sessionStorage.getItem("user")
-        // if(!userinfo){
-        //     //console.log(JSON.stringify(this.userStr))
-        //     request.post("/api/user/self", this.userStr).then(res =>{
-        //         if(res.code === '0'){
-        //             this.user = res.data
-        //             this.names = this.user.username
-        //         }
-        //     })
-        // }else{
-        //     this.user = JSON.parse(userinfo)
-        //     this.names = this.user.username
-        // }
+    components:{
+        ArrowDown
+        //AsideSystemManager,
+        // AsideAdmin,
+        // AsideUser,
+        // AsideDriver
     },
     methods:{
-        exit(){
-            // localStorage.removeItem('Authorization')
-            // sessionStorage.clear()
-            //this.$router.push("/login")
-        }
+        // exit(){
+        //     window.sessionStorage.clear();
+        //     this.$router.push('/login');
+        //}
     }
-}
+};
 </script>
 
-<style scoped>
-
+<style lang="less">
+.home-container{
+  height: 100%;
+}
+.el-header{
+  background-color: #eaedf1;
+  display: flex; //设置显示为flex布局
+  justify-content: space-between;//设置为flex左右布局
+  padding-left: 0;//左内边距为0（Logo贴左边）
+  align-items: center;//元素上下居中（防止右边按钮贴上下边）
+  color: #000000;
+  font-size: 20px;
+  > div {//内嵌的div样式
+    display: flex;
+    align-items: center;//Logo和文字上下居中
+    span {
+      margin-left: 15px;//文字左侧设置间距，防止与Logo紧贴
+    }
+  }
+}
+.el-aside{
+  background-color: #333744;
+}
+.el-main{
+  background-color: #eaedf1;
+}
 </style>

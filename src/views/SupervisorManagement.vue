@@ -1,63 +1,174 @@
 <template>
-    <div>
-        <el-form ref="loginForm" :model="form" :rules="rules" label-width="80px" class="login-box">
-            <h3 class="login-title">欢迎登录</h3>
-            <el-form-item label="账号" prop="username">
-                <el-input type="text" placeholder="请输入账号" v-model="form.username"/>
-            </el-form-item>
-            <el-form-item label="密码" prop="password">
-                <el-input type="password" placeholder="请输入密码" v-model="form.password"/>
-            </el-form-item>
-            <el-form-item>
-                <el-button type="primary" v-on:click="onSubmit('loginForm')">登录</el-button>
-            </el-form-item>
-        </el-form>
+    <div style="padding: 10px">
+        <!--    搜索区域-->
+        <div style="margin: 10px 0">
+            <el-input v-model="search" placeholder="请输入姓名"  style="width: 20%" clearable />
+            <el-button type="primary" style="margin-left: 7px" @click="load">查询督导</el-button>
+            <el-button type="primary" style="float:right" @click="createSupervisor">新增督导</el-button>
+
+            <el-dialog v-model="dialogVisible" title="新建督导" width="30%">
+                <el-form :model="form" label-width="120px">
+                    <el-form-item label = "用户名">
+                        <el-input v-model="form.username"></el-input>
+                    </el-form-item>
+                    <el-form-item label = "密码">
+                        <el-input v-model="form.password"></el-input>
+                    </el-form-item>
+                    <el-form-item label = "姓名">
+                        <el-input v-model="form.name"></el-input>
+                    </el-form-item>
+                    <el-form-item label = "性别">
+                        <el-radio v-model="form.gender" label="man">男</el-radio>
+                        <el-radio v-model="form.gender" label="woman">女</el-radio>
+                    </el-form-item>
+                    <el-form-item label = "电话号码">
+                        <el-input v-model="form.phonenum"></el-input>
+                    </el-form-item>
+                    <el-form-item label = "工作单位">
+                        <el-input v-model="form.workspace"></el-input>
+                    </el-form-item>
+                    <el-form-item label = "邮箱">
+                        <el-input v-model="form.email"></el-input>
+                    </el-form-item>
+                </el-form>
+                <template #footer>
+          <span class="dialog-footer">
+            <el-button @click="dialogVisible = false">取消</el-button>
+            <el-button type="primary" @click="save">确定</el-button>
+          </span>
+                </template>
+            </el-dialog>
+
+        </div>
+
+        <el-table :data="tableData" border stripe style="width: 100%">
+            <el-table-column prop="drivername" label="姓名" />
+            <el-table-column prop="username" label = "用户名"/>
+            <el-table-column prop="phonenum" label="联系电话" />
+            <el-table-column prop="status" label="邮箱" />
+            <el-table-column prop="title" label="职称"/>
+            <el-table-column prop="workspace" label="工作单位"/>
+            <el-table-column prop="duration" label="累计时长"/>
+            <el-table-column prop="status" label = "账号状态"/>
+            <el-table-column label="操作">
+                <template #default="scope">
+                    <el-button size="mini" @click="handleEdit(scope.row)">修改</el-button>
+                    <el-button size="mini" @click="handleEdit(scope.row)">排班</el-button>
+                    <el-popconfirm title="确认要导出吗?" @confirm="HandleDelete(scope.row.id)">
+                        <template #reference>
+                            <el-button size="mini">Delete</el-button>
+                        </template>
+                    </el-popconfirm>
+                </template>
+            </el-table-column>
+        </el-table>
+
+        <div>
+            <el-pagination
+                v-model:currentPage="currentPage"
+                :page-size="10"
+                layout="prev, pager, next, jumper"
+                :total="total"
+                @current-change="handleCurrentChange"
+                background >
+            </el-pagination>
+
+        </div>
     </div>
 </template>
 
 <script>
+// import request from "../utils/request";
+// import {ElMessage} from "element-plus";
 export default {
-    // eslint-disable-next-line vue/multi-word-component-names
-    name: "xx02",
+    name: 'supervisor-management',
+    components: {
+    },
     data() {
         return {
-            form: {
-                username: '',
-                password: ''
-            },
-
-            // 表单验证，需要在 el-form-item 元素中增加 prop 属性
-            rules: {
-                username: [
-                    {required: true, message: '账号不可为空', trigger: 'blur'}
-                ],
-                password: [
-                    {required: true, message: '密码不可为空', trigger: 'blur'}
-                ]
-            }
-
+            form:{},
+            dialogVisible: false,
+            search: '',
+            currentPage: 1 ,
+            total: 10 ,
+            tableData: [],
+            keyNum:0,
         }
-    }
+    },
+    created(){
+        //this.load()
+    },
+    mounted() {
+        document.title='督导管理'
+    },
+    methods :{
+        createSupervisor(){
+            this.dialogVisible = true
+        },
+        // load(){
+        //     request.get("/api/driver",{
+        //         params:{
+        //             pageNum: this.currentPage,
+        //             pageSize:10,
+        //             search : this.search,
+        //         },
+        //     }).then(async res => {
+        //         for (const item of res.data.records) {
+        //             await request.post("/api/user/who", item.driverid).then(res => {
+        //                 if (res.code == "0") {
+        //                     item.drivername = res.data.username
+        //                 }
+        //             })
+        //         }
+        //         console.log(res)
+        //         this.tableData = res.data.records
+        //         this.total = res.data.total
+        //     })
+        // },
+        // save(){
+        //     request.put("/api/driver",this.form).then(res => {
+        //         console.log(res)
+        //         if(res.code == "0"){
+        //             ElMessage({
+        //                 type: 'success',
+        //                 message: '修改成功',
+        //             })
+        //         }else{
+        //             ElMessage({
+        //                 type: 'error',
+        //                 message: res.msg,
+        //             })
+        //         }
+        //         this.load()
+        //     })
+        //     this.dialogVisible = false
+        // },
+        // handleEdit(row) {
+        //     this.form = JSON.parse(JSON.stringify(row))
+        //     this.dialogVisible = true
+        // },
+        // HandleDelete(id) {
+        //     console.log(id)
+        //     request.delete("/api/driver/" + id).then(res => {
+        //         console.log(res)
+        //         if(res.code == "0"){
+        //             ElMessage({
+        //                 type: 'success',
+        //                 message: '删除成功',
+        //             })
+        //         }else{
+        //             ElMessage({
+        //                 type: 'error',
+        //                 message: res.msg,
+        //             })
+        //         }
+        //     })
+        //     this.load()
+        // },
+        // handleCurrentChange(){
+        //     this.load()
+        // },
+    },
+
 }
 </script>
-
-<style lang="scss" scoped>
-
-.login-box {
-    border: 1px solid #DCDFE6;
-    width: 350px;
-    margin: 180px auto;
-    padding: 35px 35px 15px 35px;
-    border-radius: 5px;
-    -webkit-border-radius: 5px;
-    -moz-border-radius: 5px;
-    box-shadow: 0 0 25px #909399;
-}
-
-.login-title {
-    text-align: center;
-    margin: 0 auto 40px auto;
-    color: #303133;
-}
-</style>
-
