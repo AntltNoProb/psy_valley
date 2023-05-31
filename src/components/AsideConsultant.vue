@@ -1,6 +1,6 @@
 <template>
     <el-menu
-            style="width: 200px; min-height: calc(100vh - 50px) "
+            style="width: 200px; min-height: calc(100vh - 90px) "
             :default-active="$route.path"
             router
             class="el-menu-vertical-demo">
