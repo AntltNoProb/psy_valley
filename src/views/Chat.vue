@@ -66,6 +66,10 @@ export default {
             }
         },
         senMsg(){
+            let options = {
+                SDKAppID: IM_APP_ID // 接入时需要将0替换为您的即时通信 IM 应用的 SDKAppID
+            };
+            let tim = TIM.create(options);
             if(!this.imReady){
                 alert('IM系统还未准备好');
                 return
@@ -75,9 +79,9 @@ export default {
                 return
             }
             //发送消息
-            let message = this.$tim.createTextMessage({
+            let message = tim.createTextMessage({
                 to: 'lihua',
-                conversationType: this.$TIM.TYPES.CONV_C2C,
+                conversationType: TIM.TYPES.CONV_C2C,
                 // 消息优先级，用于群聊（v2.4.2起支持）。如果某个群的消息超过了频率限制，后台会优先下发高优先级的消息，详细请参考：https://cloud.tencent.com/document/product/269/3663#.E6.B6.88.E6.81.AF.E4.BC.98.E5.85.88.E7.BA.A7.E4.B8.8E.E9.A2.91.E7.8E.87.E6.8E.A7.E5.88.B6)
                 // 支持的枚举值：TIM.TYPES.MSG_PRIORITY_HIGH, TIM.TYPES.MSG_PRIORITY_NORMAL（默认）, TIM.TYPES.MSG_PRIORITY_LOW, TIM.TYPES.MSG_PRIORITY_LOWEST
                 // priority: TIM.TYPES.MSG_PRIORITY_NORMAL,
@@ -90,7 +94,7 @@ export default {
                 // cloudCustomData: 'your cloud custom data'
             });
 // 2. 发送消息
-            let promise = this.$tim.sendMessage(message);
+            let promise = tim.sendMessage(message);
             promise.then((imResponse) => {
                 // 发送成功
                 console.log(imResponse, '发送成功');

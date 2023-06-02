@@ -12,9 +12,8 @@
                 <el-input v-model="form.password" style="width: 80%" ></el-input>
             </el-form-item>
             <el-form-item label="性别" prop="gender">
-                <el-radio v-model="form.sex" label="男">男</el-radio>
-                <el-radio v-model="form.sex" label="女">女</el-radio>
-                <el-radio v-model="form.sex" label="未知">未知</el-radio>
+                <el-radio v-model="form.gender" label="男">男</el-radio>
+                <el-radio v-model="form.gender" label="女">女</el-radio>
             </el-form-item>
         </el-form>
         <span style="margin: 150px auto">

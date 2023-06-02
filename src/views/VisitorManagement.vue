@@ -8,23 +8,28 @@
 
         <el-table :data="tableData" border stripe style="width: 100%">
             <el-table-column prop="name" label="姓名" />
-            <el-table-column prop="phonenum" label="联系电话" />
+            <el-table-column prop="pno" label="联系电话" />
+            <el-table-column prop="gender" label="性别"/>
             <el-table-column prop="contact_name" label=紧急联系人 />
-            <el-table-column prop="contact_phone" label="紧急联系电话"/>
-            <el-table-column prop="register_time" label="注册时间"/>
+            <el-table-column prop="contact_pno" label="紧急联系电话"/>
             <el-table-column prop="status" label = "账号状态"/>
             <el-table-column label="操作">
                 <template #default="scope">
-
-                    <el-popconfirm title="确认要导出吗?" @confirm="HandleDelete(scope.row.id)">
+                    <el-popconfirm title="确认要禁用吗?" @confirm="HandleDelete(scope.row.id)">
                         <template #reference>
-                            <el-button size="mini">禁用</el-button>
+                            <el-button type = "danger" size="mini">禁用</el-button>
                         </template>
                     </el-popconfirm>
                 </template>
             </el-table-column>
         </el-table>
-
+<!--        "contact_name": "王文海",-->
+<!--        "gender": "男",-->
+<!--        "contact_pno": "13780396356",-->
+<!--        "pno": "17633091985",-->
+<!--        "vid": "1",-->
+<!--        "name": "武昱初",-->
+<!--        "status": "normal"-->
         <div>
             <el-pagination
                 v-model:currentPage="currentPage"
@@ -68,18 +73,25 @@ export default {
             this.dialogVisible = true
         },
         load(){
-            request.get("/visitors",{//访问访客，下面是一些用于SQL语句的参数
+            request.get("/user/visitors",{//访问访客，下面是一些用于SQL语句的参数
                 params:{
                     pageNum: this.currentPage,//页面位置
-                    pageSize:10,//页面大小
-                    search: this.search //角色（对应authority）
+                    pageSize: "10",//页面大小
+                    search: this.search //角色
                 },
             }).then(async res => {//异步请求
-                console.log(res)//你要返回的json格式{record:[" "," "],total: ""}
-                this.tableData = res.data.records//记录
+
+                this.tableData = res.data.visitor//记录
+
                 this.total = res.data.total//记录数
+
+                console.log(res)
+
             })
-        }
+        },
+        handleCurrentChange(){
+            this.load()
+        },
     },
 
 }
