@@ -1,0 +1,2 @@
+export const IM_APP_ID = 1400812784;
+export const IM_APP_SECRET = 'd13abb542e7242071555296eb5fec115d4057c803c5546a0514cd1ffb472442a';

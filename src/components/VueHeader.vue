@@ -23,6 +23,7 @@
 <script>
 import {ArrowDown} from "@element-plus/icons";
 
+
 export default {
     name: "VueHeader",
 
@@ -33,17 +34,13 @@ export default {
         }
     },
     components:{
-        ArrowDown
-        //AsideSystemManager,
-        // AsideAdmin,
-        // AsideUser,
-        // AsideDriver
+        ArrowDown,
     },
     methods:{
-        // exit(){
-        //     window.sessionStorage.clear();
-        //     this.$router.push('/login');
-        //}
+        exit(){
+            window.sessionStorage.clear();
+            this.$router.push('/login');
+        }
     }
 };
 </script>

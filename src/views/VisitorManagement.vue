@@ -40,8 +40,8 @@
 </template>
 
 <script>
-// import request from "../utils/request";
-// import {ElMessage} from "element-plus";
+import request from "../utils/request";
+//import {ElMessage} from "element-plus";
 export default {
     name: 'visitor-management',
     components: {
@@ -50,7 +50,7 @@ export default {
         return {
             form:{},
             dialogVisible: false,
-            search: '',
+            search: 'visitor',
             currentPage: 1 ,
             total: 10 ,
             tableData: [],
@@ -58,7 +58,7 @@ export default {
         }
     },
     created(){
-        //this.load()
+        this.load()
     },
     mounted() {
         document.title='访客管理'
@@ -67,69 +67,19 @@ export default {
         createSupervisor(){
             this.dialogVisible = true
         },
-        // load(){
-        //     request.get("/api/driver",{
-        //         params:{
-        //             pageNum: this.currentPage,
-        //             pageSize:10,
-        //             search : this.search,
-        //         },
-        //     }).then(async res => {
-        //         for (const item of res.data.records) {
-        //             await request.post("/api/user/who", item.driverid).then(res => {
-        //                 if (res.code == "0") {
-        //                     item.drivername = res.data.username
-        //                 }
-        //             })
-        //         }
-        //         console.log(res)
-        //         this.tableData = res.data.records
-        //         this.total = res.data.total
-        //     })
-        // },
-        // save(){
-        //     request.put("/api/driver",this.form).then(res => {
-        //         console.log(res)
-        //         if(res.code == "0"){
-        //             ElMessage({
-        //                 type: 'success',
-        //                 message: '修改成功',
-        //             })
-        //         }else{
-        //             ElMessage({
-        //                 type: 'error',
-        //                 message: res.msg,
-        //             })
-        //         }
-        //         this.load()
-        //     })
-        //     this.dialogVisible = false
-        // },
-        // handleEdit(row) {
-        //     this.form = JSON.parse(JSON.stringify(row))
-        //     this.dialogVisible = true
-        // },
-        // HandleDelete(id) {
-        //     console.log(id)
-        //     request.delete("/api/driver/" + id).then(res => {
-        //         console.log(res)
-        //         if(res.code == "0"){
-        //             ElMessage({
-        //                 type: 'success',
-        //                 message: '删除成功',
-        //             })
-        //         }else{
-        //             ElMessage({
-        //                 type: 'error',
-        //                 message: res.msg,
-        //             })
-        //         }
-        //     })
-        //     this.load()
-        // },
-        // handleCurrentChange(){
-        //     this.load()
-        // },
+        load(){
+            request.get("/visitors",{//访问访客，下面是一些用于SQL语句的参数
+                params:{
+                    pageNum: this.currentPage,//页面位置
+                    pageSize:10,//页面大小
+                    search: this.search //角色（对应authority）
+                },
+            }).then(async res => {//异步请求
+                console.log(res)//你要返回的json格式{record:[" "," "],total: ""}
+                this.tableData = res.data.records//记录
+                this.total = res.data.total//记录数
+            })
+        }
     },
 
 }

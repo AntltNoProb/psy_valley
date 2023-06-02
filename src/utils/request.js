@@ -1,20 +1,21 @@
 import axios from 'axios'
-import router from "../router";
-import {error} from "@babel/eslint-parser/lib/convert";
 
 const request = axios.create({
+    baseURL: '/api',
     timeout: 5000
 })
 
 // request 拦截器
 // 可以自请求发送前对请求做一些处理
-// 比如统一加token
+// 比如统一加token，对请求参数统一加密
 request.interceptors.request.use(config => {
     config.headers['Content-Type'] = 'application/json;charset=utf-8';
+
     if (localStorage.getItem('Authorization')) {
         config.headers.Authorization = localStorage.getItem('Authorization');
     }
-    return config;
+    // IMconfig.headers['token'] = user.token;  // 设置请求头
+    return config
 }, error => {
     return Promise.reject(error)
 });
@@ -24,11 +25,6 @@ request.interceptors.request.use(config => {
 request.interceptors.response.use(
     response => {
         let res = response.data;
-        if(res === 'failed'){
-            router.push("/login")
-            alert("你没有登录")
-            return Promise.reject(error)
-        }
         // 如果是返回的文件
         if (response.config.responseType === 'blob') {
             return res
@@ -40,12 +36,9 @@ request.interceptors.response.use(
         return res;
     },
     error => {
-        console.log('err' + error) // for debug
+        console.log('err' + error) // for IMdebug
         return Promise.reject(error)
     }
-
 )
-
-
 export default request
 

@@ -158,10 +158,8 @@ export default {
     margin: 10px;
     text-align: center;
     border-radius: 4px;
-
     color: var(--el-color-primary);
 }
-
 .select-form {
     margin-top: 20px;
 }

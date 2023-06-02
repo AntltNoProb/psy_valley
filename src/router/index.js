@@ -10,40 +10,43 @@ const routes = [
              {path: 'home',
                  name: 'home',
                  component: () => import('@/views/Home.vue'),
+                 meta: {
+                     roles: ['SystemManager','Consultant','Supervisors']
+                 },
              },
              {path: 'consult-record',
                 name: 'consult-record',
                 component: ()=>import('@/views/ConsultRecord.vue'),
                 meta: {
-                    //         roles: ['admin']
+                             roles: ['SystemManager','Consultant','Supervisors']
                 },
             },
             {path: 'dialog-record',
                 name: 'dialog-record',
                 component: ()=>import('@/views/DialogRecord.vue'),
                 meta: {
-                    //         roles: ['admin']
+                            roles: ['admin','Supervisors']
                 },
             },
             {path: 'supervisor-management',
                 name: 'supervisor-management',
                 component: ()=>import('@/views/SupervisorManagement.vue'),
                 meta: {
-                    //         roles: ['user']
+                             roles: ['SystemManager']
                 },
             },
             {path: 'visitor-management',
                 name: 'visitor-management',
                 component: ()=>import('@/views/VisitorManagement.vue'),
                 meta: {
-                    //         roles: ['employee']
+                             roles: ['SystemManager','Supervisors']
                 },
             },
             {path: 'counselor-management',
                 name: 'counselor-management',
                 component: ()=>import('@/views/CounselorManagement.vue'),
                 meta: {
-                    //         roles: ['admin']
+                             roles: ['SystemManager','Supervisors']
                 },
             },
 
@@ -51,19 +54,20 @@ const routes = [
                  name: 'userspace',
                  component: () => import('@/views/UserSpace.vue'),
                  meta: {
-                    // roles: ['admin', 'user','employee']
+                     roles: ['SystemManager','Supervisors','Consultant']
                  },
              },
             {path: 'working-schedule',
                 name: 'working-schedule',
                 component: () => import('@/views/WorkingSchedule.vue'),
                 meta: {
-                    // roles: ['admin', 'user','employee']
+                     roles: ['SystemManager','Supervisors','Consultant']
                 },
             },
         ]
     },
-    {path: '/login', name: 'login', component: ()=>import('@/views/Login.vue')}
+    {path: '/login', name: 'login', component: ()=>import('@/views/Login.vue')},
+    {path: '/chat', name: 'chat', component: ()=>import('@/views/Chat.vue')}
 ]
 
 const router = createRouter({
@@ -71,26 +75,24 @@ const router = createRouter({
     routes
 })
 
-// router.beforeEach((to, from, next) => {
-//     // if (to.path === '/login' || to.path === '/register' || to.path === '/404' ) {
-//     //     next();
-//     // } else {
-//     //     let token = localStorage.getItem('Authorization');
-//     //     if (token === 'null' || token === '') {
-//     //         next('/login');
-//     //     } else {
-//     //         let user = sessionStorage.getItem('user')
-//     //         if(!user){
-//     //             next('/login')
-//     //         }
-//     //         let role = JSON.parse(user).authority
-//     //         if(to.meta.roles.includes(role)){
-//     //             next()	//放行
-//     //         }else{
-//     //             next('/404')	//跳到404页面
-//     //         }
-//     //     }
-//     // }
-//     next('/login')
-// });
+router.beforeEach((to, from, next) => {
+    if (to.path === '/login') {
+        next();
+    } else {
+        let token = localStorage.getItem('Authorization');
+        if (token === 'null' || token === '') {
+            next('/login');
+        } else {
+            let user = sessionStorage.getItem('user')
+            if(!user){
+                next('/login')
+            }
+            next()
+            if(to.meta.roles.includes(JSON.parse(user).authority)){
+                next()	//放行
+            }
+        }
+    }
+    next('/login')
+});
 export default router

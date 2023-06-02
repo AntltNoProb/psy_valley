@@ -6,14 +6,9 @@
         </Header>
         <!--主体-->
         <div style="display: flex">
-            <AsideConsultant/>
-<!--            <AsideSupervisors/>-->
-            <!--侧边栏 确认用户的权限已给出对应-->
-<!--            <AsideSystemManager/>-->
-<!--            <AsideAdmin v-if="user.authority === 'admin'" />-->
-<!--            <AsideUser v-if="user.authority === 'user'" />-->
-<!--            <AsideDriver v-if="user.authority === 'employee'" />-->
-            <!--内容-->
+            <AsideSystemManager v-if = "user.authority == 'SystemManager'"/>
+            <AsideConsultant v-if = "user.authority == 'Consultant'"/>
+            <AsideSupervisors v-if = "user.authority == 'Supervisors'"/>
             <router-view style="flex: 1"/>
         </div>
     </div>
@@ -31,18 +26,16 @@ export default {
         AsideSupervisors,
         AsideSystemManager,
         VueHeader,
-
     },
     data(){
         return{
-            //user:{}
+            user:{}
         }
     },
     created() {
-        // let userinfo = sessionStorage.getItem("user")
-        // this.user = JSON.parse(userinfo)
+        let userinfo = sessionStorage.getItem("user")
+        this.user = JSON.parse(userinfo)[0]
     }
-
 }
 </script>
 

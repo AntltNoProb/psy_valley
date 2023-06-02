@@ -102,69 +102,7 @@ export default {
         createSupervisor(){
             this.dialogVisible = true
         },
-        // load(){
-        //     request.get("/api/driver",{
-        //         params:{
-        //             pageNum: this.currentPage,
-        //             pageSize:10,
-        //             search : this.search,
-        //         },
-        //     }).then(async res => {
-        //         for (const item of res.data.records) {
-        //             await request.post("/api/user/who", item.driverid).then(res => {
-        //                 if (res.code == "0") {
-        //                     item.drivername = res.data.username
-        //                 }
-        //             })
-        //         }
-        //         console.log(res)
-        //         this.tableData = res.data.records
-        //         this.total = res.data.total
-        //     })
-        // },
-        // save(){
-        //     request.put("/api/driver",this.form).then(res => {
-        //         console.log(res)
-        //         if(res.code == "0"){
-        //             ElMessage({
-        //                 type: 'success',
-        //                 message: '修改成功',
-        //             })
-        //         }else{
-        //             ElMessage({
-        //                 type: 'error',
-        //                 message: res.msg,
-        //             })
-        //         }
-        //         this.load()
-        //     })
-        //     this.dialogVisible = false
-        // },
-        // handleEdit(row) {
-        //     this.form = JSON.parse(JSON.stringify(row))
-        //     this.dialogVisible = true
-        // },
-        // HandleDelete(id) {
-        //     console.log(id)
-        //     request.delete("/api/driver/" + id).then(res => {
-        //         console.log(res)
-        //         if(res.code == "0"){
-        //             ElMessage({
-        //                 type: 'success',
-        //                 message: '删除成功',
-        //             })
-        //         }else{
-        //             ElMessage({
-        //                 type: 'error',
-        //                 message: res.msg,
-        //             })
-        //         }
-        //     })
-        //     this.load()
-        // },
-        // handleCurrentChange(){
-        //     this.load()
-        // },
+
     },
 
 }
