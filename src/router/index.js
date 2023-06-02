@@ -9,7 +9,7 @@ const routes = [
         children:[
              {path: 'home',
                  name: 'home',
-                 component: () => import('@/views/Home.vue'),
+                 component: () => import('@/views/HomeAdmin.vue'), // to modify 
                  meta: {
                      roles: ['SystemManager','Consultant','Supervisors']
                  },
