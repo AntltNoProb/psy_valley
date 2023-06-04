@@ -85,7 +85,7 @@ export default {
                     { pattern: /^.{6,}$/, required: true, message: "请输入正确格式的新密码", trigger: "blur" },
                 ],
                 checkPassword: [
-                    { pattern: /^.{6,}$/, required: true, message: "不能为空", trigger: "blur" },
+                    { pattern: /^.{6,}$/, required: true, message: "密码不同", trigger: "blur" },
                     { validator: checkpass, trigger: "blur" },
                 ],
             },
@@ -109,6 +109,7 @@ export default {
         onSubmit(formName) {
             this.$refs[formName].validate((valid) => {
                 if (valid) {
+                    this.form.password = this.form.newPassword
                     request.post("user/changePassword",this.form).then(res => {
                         console.log(res)
                         if(res.code === "1"){
