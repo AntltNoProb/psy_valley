@@ -7,8 +7,8 @@
         <!--主体-->
         <div style="display: flex">
             <AsideSystemManager v-if = "user.authority == 'SystemManager'"/>
-            <AsideConsultant v-if = "user.authority == 'Consultant'"/>
-            <AsideSupervisors v-if = "user.authority == 'Supervisors'"/>
+            <AsideConsultant v-if = "user.authority == 'Counselor'"/>
+            <AsideSupervisors v-if = "user.authority == 'Supervisor'"/>
             <router-view style="flex: 1"/>
         </div>
     </div>
@@ -34,7 +34,8 @@ export default {
     },
     created() {
         let userinfo = sessionStorage.getItem("user")
-        this.user = JSON.parse(userinfo)[0]
+        this.user = JSON.parse(userinfo)
+        console.log(userinfo)
     }
 }
 </script>

@@ -78,6 +78,7 @@ export default {
                     request.post("user/login",this.form).then(res => {
                         console.log(res)
                         if(res.code === "1"){
+
                             this.userToken = res.data.token
                             // 将用户token保存到vuex中
                             this.changeLogin({ Authorization:this.userToken })
@@ -87,6 +88,7 @@ export default {
                             })
                             sessionStorage.setItem("user", JSON.stringify(res.data.user))
                             this.$router.push("/")
+
                         }else{
 
                             ElMessage({

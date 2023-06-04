@@ -15,21 +15,15 @@
             <el-table-column prop="status" label = "账号状态"/>
             <el-table-column label="操作">
                 <template #default="scope">
-                    <el-popconfirm title="确认要禁用吗?" @confirm="HandleDelete(scope.row.id)">
+                    <el-popconfirm title="确认要修改吗?" @confirm="HandleUpdate(scope.row.status, scope.row.pno)">
                         <template #reference>
-                            <el-button type = "danger" size="mini">禁用</el-button>
+                            <el-button type = "danger" size = "small" v-if = " scope.row.status=='normal'" >禁用</el-button>
+                            <el-button type = "primary" size = "small" v-show = " scope.row.status=='banned'" >解禁</el-button>
                         </template>
                     </el-popconfirm>
                 </template>
             </el-table-column>
         </el-table>
-<!--        "contact_name": "王文海",-->
-<!--        "gender": "男",-->
-<!--        "contact_pno": "13780396356",-->
-<!--        "pno": "17633091985",-->
-<!--        "vid": "1",-->
-<!--        "name": "武昱初",-->
-<!--        "status": "normal"-->
         <div>
             <el-pagination
                 v-model:currentPage="currentPage"
@@ -46,7 +40,7 @@
 
 <script>
 import request from "../utils/request";
-//import {ElMessage} from "element-plus";
+import {ElMessage} from "element-plus";
 export default {
     name: 'visitor-management',
     components: {
@@ -54,8 +48,8 @@ export default {
     data() {
         return {
             form:{},
+            search: "",
             dialogVisible: false,
-            search: 'visitor',
             currentPage: 1 ,
             total: 10 ,
             tableData: [],
@@ -73,26 +67,57 @@ export default {
             this.dialogVisible = true
         },
         load(){
-            request.get("/user/visitors",{//访问访客，下面是一些用于SQL语句的参数
+            request.get("/visitors/list",{//访问访客，下面是一些用于SQL语句的参数
                 params:{
                     pageNum: this.currentPage,//页面位置
-                    pageSize: "10",//页面大小
-                    search: this.search //角色
+                    pageSize: 10,//页面大小
+                    search: this.search //要查找的人名
                 },
             }).then(async res => {//异步请求
-
                 this.tableData = res.data.visitor//记录
-
                 this.total = res.data.total//记录数
-
                 console.log(res)
-
             })
         },
         handleCurrentChange(){
             this.load()
         },
-    },
+        HandleUpdate(status,id) {//返回电话号码，进行删除
 
+            console.log(id)
+            if(status == 'banned') {
+                request.patch("/visitors/enable/" + id).then(res => {
+                    console.log(res)
+                    if (res.code == "1") {
+                        ElMessage({
+                            type: 'success',
+                            message: '修改成功',
+                        })
+                    } else {
+                        ElMessage({
+                            type: 'error',
+                            message: res.msg,
+                        })
+                    }
+                })
+            } else {
+                request.patch("/visitors/banned/" + id).then(res => {
+                    console.log(res)
+                    if (res.code == "1") {
+                        ElMessage({
+                            type: 'success',
+                            message: '修改成功',
+                        })
+                    } else {
+                        ElMessage({
+                            type: 'error',
+                            message: res.msg,
+                        })
+                    }
+                })
+            }
+            this.load()
+        },
+    },
 }
 </script>

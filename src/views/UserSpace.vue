@@ -1,104 +1,133 @@
 <template>
 
     <div style="padding: 150px;">
-        <el-form ref="userform" :model="form" label-width="120px" style="width: 700px" :rules="rules">
-            <el-form-item label="姓名" prop="name">
-                <el-input v-model="form.name" style="width: 80%" ></el-input>
+        <el-form model="form" label-width="120px" style="width: 700px" :rules="rules">
+            <el-form-item label = "姓名:">
+                <el-text>{{form.name}}</el-text>
             </el-form-item>
-            <el-form-item label="用户名" prop="username">
-                <el-input v-model="form.username" style="width: 80%" ></el-input>
+            <el-form-item label = "用户名:">
+                <el-text>{{form.username}}</el-text>
             </el-form-item>
-            <el-form-item label="密码" prop="password">
-                <el-input v-model="form.password" style="width: 80%" ></el-input>
+            <el-form-item label = "密码:">
+                <el-text >{{form.password}}</el-text>
             </el-form-item>
-            <el-form-item label="性别" prop="gender">
-                <el-radio v-model="form.gender" label="男">男</el-radio>
-                <el-radio v-model="form.gender" label="女">女</el-radio>
+            <el-form-item label = "性别:">
+                <el-text v-if = "form.gender == '男'">{{form.gender}}</el-text>
+                <el-text v-if = "form.gender == '女'">{{form.gender}}</el-text>
+            </el-form-item>
+            <el-form-item label = "联系电话:">
+                <el-text>{{form.pno}}</el-text>
+            </el-form-item>
+            <el-form-item label = "工作单位:">
+                <el-text>{{form.workunit}}</el-text>
+            </el-form-item>
+            <el-form-item label = "邮箱:">
+                <el-text>{{form.email}}</el-text>
+            </el-form-item>
+            <el-button type="primary" @click="changePassword" style="margin: 50px 200px">修改密码</el-button>
+        </el-form>
+    </div>
+    <!-- 修改密码弹出框 -->
+    <el-dialog title="修改密码" v-model="dialogFormVisible">
+        <el-form :model="form" ref="pwdForm" :rules="rules">
+
+            <el-form-item label="新密码" prop="newPassword" >
+                <el-input v-model="form.newPassword" placeholder="至少6位密码" show-password></el-input>
+            </el-form-item>
+
+            <el-form-item label="确认密码" prop="checkPassword">
+                <el-input v-model="form.checkPassword" show-password></el-input>
             </el-form-item>
         </el-form>
-        <span style="margin: 150px auto">
-        <el-button type="primary" @click="save" style="margin: 50px 200px">Confirm</el-button>
-      </span>
-    </div>
+        <template #footer>
+            <span class="dialog-footer">
+                <el-button @click="dialogFormVisible = false">取 消</el-button>
+                <el-button type="primary" @click="onSubmit('pwdForm')">确 定</el-button>
+            </span>
+        </template>
+    </el-dialog>
 </template>
 <script>
 
-//import request from "../utils/request";
-//import {ElMessage} from "element-plus";
+
+import request from "@/utils/request";
+import {ElMessage} from "element-plus";
 
 export default {
     name: 'UserSpace',
     components: {
     },
     data() {
-        const validnum = (rule, value, callback) => {
-            if(!Number.isInteger(value)){
-                callback(new Error("要求是数字"))
+        // 检测新密码和确认密码一致性
+        let checkpass = (rule, value, callback) => {
+            if (value == this.form.newPassword) {
+                callback();
             } else {
-                callback()
+                callback(new Error("密码不一致"));
             }
-        }
-        const checklen = (rule, value, callback) => {
-            if(String(this.form.phonenum).length !== 11) {
-                callback(new Error("手机号要求11位"))
-            } else {
-                callback()
-            }
-        }
+        };
         return {
             user:{},
+            dialogFormVisible: false,
             form:{
-                name:null,
+                name:'wwh',
                 username:null,
                 password:null,
-                gender:null,
+                gender:'男',
+                pno:null,
+                workunit:null,
+                email:null,
+                newPassword:null,
+                checkPassword:null
             },
-            rules:{
-                phonenum: [
-                    {
-                        validator: validnum,
-                        trigger: 'blur',
-                    },
-                    {
-                        validator: checklen,
-                        trigger: 'blur',
-                    },
-                ]
+            rules: {
+                newPassword: [
+                    { pattern: /^.{6,}$/, required: true, message: "请输入正确格式的新密码", trigger: "blur" },
+                ],
+                checkPassword: [
+                    { pattern: /^.{6,}$/, required: true, message: "不能为空", trigger: "blur" },
+                    { validator: checkpass, trigger: "blur" },
+                ],
             },
+
         }
     },
     created() {
-        //这一段代码比较重要，是通过token去后端请求其user信息
-        //this.userStr = localStorage.getItem('Authorization')
-        //let userinfo = sessionStorage.getItem("user")
-        // if(!userinfo){
-        //     //console.log(JSON.stringify(this.userStr))
-        //     request.post("/api/user/self", this.userStr).then(res =>{
-        //         console.log(res)
-        //         if(res.code === '0'){
-        //             this.form.username =res.data.username
-        //             this.form.age = Number(res.data.age)
-        //             this.form.sex = res.data.sex
-        //             this.form.phonenum = Number(res.data.phonenum)
-        //         }
-        //     })
-        // }else {
-        //     this.user = JSON.parse(userinfo)
-        //     this.form.username =this.user.username
-        //     this.form.sex = this.user.sex
-        //     this.form.phonenum = Number(this.user.phonenum)
-        // }
+        this.userStr = localStorage.getItem('Authorization')
+        let userinfo = sessionStorage.getItem("user")
+        this.user = JSON.parse(userinfo)
+        this.form =this.user
     },
     mounted(){
         document.title='个人信息'
     },
     methods:{
-        save(){
 
+        changePassword(){
+            this.dialogFormVisible=true
+        },
+        onSubmit(formName) {
+            this.$refs[formName].validate((valid) => {
+                if (valid) {
+                    request.post("user/changePassword",this.form).then(res => {
+                        console.log(res)
+                        if(res.code === "1"){
+                            ElMessage({
+                                type: 'success',
+                                message: '修改成功，将重新登录',
+                            })
+                            sessionStorage.clear()
+                            this.$router.push("/login")
+                        }else{
+                            ElMessage({
+                                type: 'error',
+                                message: res.msg,
+                            })
+                        }
+                    })
+                }
+            });
         },
     }
 }
 </script>
-<style scoped>
-
-</style>

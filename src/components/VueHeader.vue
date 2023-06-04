@@ -6,7 +6,7 @@
             </div>
             <el-dropdown >
                 <span class="el-dropdown-link">
-                    {{names}} <el-icon class="el-icon--right"><arrow-down/></el-icon>
+                    {{name}} <el-icon class="el-icon--right"><arrow-down/></el-icon>
                 </span>
                 <template #dropdown>
                     <el-dropdown-menu>
@@ -29,12 +29,15 @@ export default {
 
     data(){
         return{
-            names: "Wangwenhai",
-            //user:{}
+            name : "wwh"
         }
     },
     components:{
         ArrowDown,
+    },
+    created() {
+        // let userinfo = sessionStorage.getItem("user")
+        // this.user = JSON.parse(userinfo)
     },
     methods:{
         exit(){
