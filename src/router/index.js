@@ -14,6 +14,20 @@ const routes = [
                      roles: ['SystemManager','Consultant','Supervisors']
                  },
              },
+            {path: 'chat',
+                name: 'Chat',
+                component: () => import('@/views/Chat.vue'), // to modify
+                meta: {
+                    roles: ['Consultant']
+                },
+            },
+            {path: 'consult-online',
+                name: 'ConsultOnline',
+                component: () => import('@/views/ConsultOnline.vue'), // to modify
+                meta: {
+                    roles: ['Consultant']
+                },
+            },
              {path: 'consult-record',
                 name: 'consult-record',
                 component: ()=>import('@/views/ConsultRecord.vue'),

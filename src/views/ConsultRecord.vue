@@ -87,8 +87,8 @@ export default {
     methods :{
 
         dateFormat(picker) {
-            this.params.startTime = picker[0].toString()
-            this.params.endTime = picker[1].toString()
+            this.param.startTime = picker[0].toString()
+            this.param.endTime = picker[1].toString()
         },
 
         load(){
@@ -115,21 +115,39 @@ export default {
                     type: 'error',
                     message: '没有选中！',
                 })
-                return
             }
-            // request.post("/records/exportAll", this.multipleSelection).then(res =>{
-            //
-            // })
+            this.multipleSelection.forEach(function (item){
+                this.HandleExport(item.id)
+            })
         },
         handleSelectionChange(val){
             this.multipleSelection = val.map(v => v.id)
         },
 
-        // HandleExport(id) {//等待处理
-        //     request.post("/records/" + id).then(res => {
-        //
-        //     })
-        // },
+        HandleExport(id) {//等待处理
+            request.get("records/"+id ,{
+                responseType: 'blob',//设置返回类型为文件
+            }).then((res)=>{
+                const link=document.createElement('a');
+                try {
+                    let blob = new Blob([res.data],{type: 'text/plain'});//文件的格式为txt
+                    let _fileName = res.headers['content-disposition'].split(';')[1].split('=')[1];//文件名，中文无法解析的时候会显示 _(下划线),生产环境获取不到
+                    link.style.display='none';
+                    // 兼容不同浏览器的URL对象
+                    const url = window.URL || window.webkitURL || window.moxURL;
+                    link.href=url.createObjectURL(blob);
+                    link.setAttribute('download', _fileName.substring(_fileName.lastIndexOf('_')+1));
+                    document.body.appendChild(link);
+                    link.click();
+                    document.body.removeChild(link);
+                    url.revokeObjectURL(link.href);//销毁url对象
+                }catch (e) {
+                    console.log('下载的文件出错',e)
+                }
+            }).catch(()=>{
+
+            })
+        },
 
         handleCurrentChange(){
             this.load()

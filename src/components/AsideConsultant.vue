@@ -16,6 +16,10 @@
             <el-icon><icon-menu /></el-icon>
             <span>咨询记录</span>
         </el-menu-item>
+        <el-menu-item index="/consult-online">
+            <el-icon><icon-menu /></el-icon>
+            <span>会话列表</span>
+        </el-menu-item>
         <el-menu-item index="/userspace">
             <el-icon><setting /></el-icon>
             <template #title>账户设置</template>

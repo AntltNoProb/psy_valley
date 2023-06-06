@@ -47,7 +47,7 @@ export default {
     name:"AsideSystemManager",
     data(){
         return{
-            //names: "Wangwenhai"
+
         }
     },
     mounted() {
@@ -57,8 +57,6 @@ export default {
         Setting,
         ArrowDown ,
         IconMenu,
-
     },
-
 }
 </script>
