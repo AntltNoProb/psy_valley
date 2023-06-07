@@ -1,6 +1,6 @@
 <template>
     <el-card class="consult-data">
-        <el-row :gutter="10">
+        <el-row :gutter="10" type="flex" align="middle">
             <el-col :span="eachSpan">
                 <el-text class="consult-card-header">今日咨询数</el-text>
                 <el-text class="consult-card-main" size="large" tag="b">{{ count }}</el-text>

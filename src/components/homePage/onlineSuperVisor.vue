@@ -1,24 +1,24 @@
 <template>
-    <el-card class="online-consultant">
+    <el-card class="online-supervisor">
         <el-row class="outer-row" :gutter="10" type="flex" align="middle">
             <el-col :span="18">
-                <el-text class="consult-card-header">在线咨询师</el-text>
-                <div class="consultant-list">
-                    <div v-if="consultantArray.length <= 0" class="list-placeholder">
-                        <el-text type="info">暂无在线咨询师</el-text>
+                <el-text class="supervise-card-header">在线督导</el-text>
+                <div class="supervisor-list">
+                    <div v-if="superVisorArray.length <= 0" class="list-placeholder">
+                        <el-text type="info">暂无在线督导</el-text>
                     </div>
                     <el-row>
-                        <el-tooltip  v-for="(consultant, index) in consultantArray" :key="index">
+                        <el-tooltip :visible="false" v-for="(supervisor, index) in superVisorArray" :key="index">
                             <template #content>
-                                <span>{{ consultant.name }}</span>
+                                <span>{{ supervisor.name }}</span>
                             </template>
-                            <el-col :span="8" class="consult-card">
-                                <el-text class="consult-name" truncated>{{ consultant.name }}</el-text>
+                            <el-col :span="24" class="supervise-card">
+                                <el-text class="supervise-name" truncated>{{ supervisor.name }}</el-text>
                                 <el-tag 
-                                    class="consult-state"
-                                    :type="consultant.busy ? 'danger' : 'success'"
+                                    class="supervise-state"
+                                    :type="supervisor.busy ? 'danger' : 'success'"
                                 >
-                                    {{ consultant.busy ? '忙碌' : '空闲' }}
+                                    {{ supervisor.busy ? '忙碌' : '空闲' }}
                                 </el-tag>
                         </el-col>
                             </el-tooltip>
@@ -26,7 +26,7 @@
                     </el-row>
                 </div>
             </el-col>
-            <el-col class="consult-count" :span="6">
+            <el-col class="supervise-count" :span="6">
                 <el-statistic title="正在进行的咨询数" :value="curCount" />
             </el-col>
         </el-row>
@@ -35,7 +35,7 @@
 <script>
 export default {
     props: {
-        consultantArray: {
+        superVisorArray: {
             type: Array,
             default() {
                 return [
@@ -59,22 +59,23 @@ export default {
 
 </script>
 <style>
-.consultant-list {
-    min-height: 150px;
+.supervisor-list {
+    height: 150px;
+    overflow-y: scroll;
     border-top: 1px solid var(--el-border-color);
 }
 
-.online-consultant .el-row .el-col {
+.online-supervisor .el-row .el-col {
     align-items: center;
     text-align: center;
     justify-content: space-between;
 }
 
-.online-consultant .el-row .el-col:not(:last-child) {
+.online-supervisor .el-row .el-col:not(:last-child) {
     border-right: 1px solid var(--el-border-color);
 }
 
-.consult-count {
+.supervise-count {
     align-items: center;
     text-align: center;
     justify-content: space-between;
@@ -86,17 +87,17 @@ export default {
     justify-content: space-between;
 }
 
-.consult-name {
+.supervise-name {
     display: inline-flex;
-    margin-left: 2px;    
+    margin-left: 2em;    
 }
 
-.consult-state {
+.supervise-state {
     display: inline-flex;
     margin: 5px 3px;
 }
 
-.consult-card {
+.supervise-card {
     border: 1px solid var(--el-border-color);
     border-radius: var(--el-border-radius-small);
     display: flex;

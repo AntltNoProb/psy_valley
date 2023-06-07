@@ -16,10 +16,10 @@
         </el-form>
         <template #footer>
             <span class="dialog-footer">
-                <el-button @click="dialogVisible = false">Cancel</el-button>
+                <el-button @click="dialogVisible = false">取消</el-button>
                 <el-button type="primary" 
                     @click="dialogVisible = false, onAdd(newSchedule)">
-                    Confirm
+                    确定
                 </el-button>
             </span>
         </template>
@@ -27,7 +27,13 @@
     <el-container class="calendar-container" style="margin: 20px">
 
         <el-col :span="18">
-            <FullCalendar ref="calendar" class="calendar" :options="calendarOptions" />
+            <FullCalendar ref="calendar" class="calendar" :options="calendarOptions">
+                <template #dayCellContent="arg">
+                    <div style="width:100%; text-align: end;">{{ arg.dayNumberText }}</div>
+                    <el-text type="primary">咨询师: {{ 3 }} 人</el-text><br/>
+                    <el-text type="success">督导: {{ 3 }} 人</el-text>
+                </template>
+            </FullCalendar>
         </el-col>
         <el-col :span="6">
             <el-card class="calendar-panel" shadow="hover">
@@ -40,7 +46,7 @@
                         </el-radio-group>
                     </div>
                 </template>
-                <el-table :data="scheduleData[scheduleType]" :show-header=false class="schedule-list">
+                <el-table :data="getCurrentList()" :show-header=false class="schedule-list">
                     <el-table-column prop="name" />
                     <el-table-column align="right">
                         <template #default="scope">
@@ -64,6 +70,8 @@
 import FullCalendar from '@fullcalendar/vue3'
 import dayGridPlugin from '@fullcalendar/daygrid'
 import interacationPlugin from '@fullcalendar/interaction'
+import request from '@/utils/request'
+import { ElMessage } from 'element-plus'
 export default {
     name: 'work-schedule',
     components: {
@@ -90,22 +98,36 @@ export default {
                 headerToolbar: {
                     right: 'prev,myTodayButton,next',
                     left: 'title',
+                },
+                eventDisplay: 'none',
+                dayCellDidMount: function(arg) {
+                    let ev = arg.el.querySelector('.fc-daygrid-day-events');
+                    ev.className = 'day-events';
                 }
             },
             scheduleType: "counselor",
             selectDate: null,
             // to modify
-            scheduleData: {
+            scheduleData: [{
+                date: 1,
                 counselor: [{ name: 'd' }],
                 supervisor: [{ name: 'd' }, { name: 'b' }, { name: 'f' }]
-            },
+            }],
             dialogVisible: false,
             newSchedule: '',
         }
     },
     methods: {
         onDateClick(info) {
+            if (this.selectDate != null &&
+            (info.start.getFullYear() != this.selectDate.getFullYear() ||
+            info.start.getMonth() != this.selectDate.getMonth())) {
+                this.onMonthChange(info.start.getFullYear(), info.start.getMonth());
+            }
             this.selectDate = info.start;
+        },
+        onMonthChange(year, month) {
+            console.log(year, month);
         },
         beforeDateClick(info) {
             console.log('b');
@@ -113,17 +135,46 @@ export default {
         },
         onRemove(index) {
             // to modify
-            this.scheduleData[this.scheduleType].splice(index, 1);
+            this.scheduleData[0][this.scheduleType].splice(index, 1);
         },
         onAdd(s) {
             // to modify
-            this.scheduleData[this.scheduleType].push({name:s});
+            this.scheduleData[0][this.scheduleType].push({name:s});
         },
         moveToToday() {
             let capi = this.$refs.calendar.getApi();
             capi.select(new Date());
             capi.today();
-        }
+        },
+        getCurrentList() {
+            if (this.selectDate == null) {
+                return null;
+            }
+            let index = this.selectDate.getDate() - 1;
+            if (index < 0 || index >= this.scheduleData.length) {
+                return null;
+            }
+            return this.scheduleData[index][this.scheduleType];
+        },
+        loadMonthData(date) {
+            const url='';
+            request.post(url, date).then(res => {
+                if (res.code == '1') {
+                    console.log(res.data);
+                } else {
+                    ElMessage({
+                        type: 'success',
+                        message: '登录成功',
+                    });
+                }
+            })
+        },
+        addData() {
+
+        },
+        removeData() {
+
+        },
     },
     computed: {
         timeStr() {
@@ -162,5 +213,9 @@ export default {
 }
 .select-form {
     margin-top: 20px;
+}
+.day-events {
+    min-height: 0;
+    margin-top: 10px;
 }
 </style>

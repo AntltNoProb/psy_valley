@@ -29,13 +29,14 @@ export default {
     },
     data(){
         return{
-            user: {}
+            user: {name:'a', authority:'SystemManager'}
         }
     },
     created() {
-        let userinfo = sessionStorage.getItem("user")
-        this.user = JSON.parse(userinfo)
-        console.log(userinfo)
+        // let userinfo = sessionStorage.getItem("user")
+        // this.user = JSON.parse(userinfo)
+        // console.log(userinfo)
+        sessionStorage.setItem("user", JSON.stringify(this.user))
     }
 }
 </script>

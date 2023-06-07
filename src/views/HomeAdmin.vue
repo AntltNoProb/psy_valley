@@ -4,18 +4,23 @@
         <el-main style="margin: 10px 0">
             <el-row :gutter="10">
                 <el-col :span=8>
-                    <consultCount class="grid-content" :count="todayConsultCount" :time="todayConsultTime" />
+                    <consultCount shadow="hover" class="grid-content" :count="todayConsultCount" :time="todayConsultTime" />
                 </el-col>
                 <el-col :span=16>
-                    <constructingPage />
+                    <todayStatistic shadow="hover" class="grid-content" />
                 </el-col>
             </el-row>
             <el-row :gutter="10">
                 <el-col :span="12">
-                    <onlineConsultant class="grid-content" />
+                    <onlineConsultant shadow="hover" class="grid-content" />
                 </el-col>
                 <el-col :span="12">
-                    <onlineConsultant class="grid-content" />
+                    <onlineSuperVisor shadow="hover" class="grid-content" />
+                </el-col>
+            </el-row>
+            <el-row :gutter="10">
+                <el-col :span="24">
+                    <weekStatistic shadow="hover" class="grid-content" />
                 </el-col>
             </el-row>
         </el-main>
@@ -26,12 +31,18 @@
 import consultCount from "@/components/homePage/consultCount.vue";
 import onlineConsultant from "@/components/homePage/onlineConsultant.vue";
 import constructingPage from "@/components/homePage/constructingPage.vue";
+import onlineSuperVisor from "@/components/homePage/onlineSuperVisor.vue";
+import todayStatistic from "@/components/homePage/todayStatistic.vue";
+import weekStatistic from "@/components/homePage/weekStatistic.vue";
 export default {
     name: 'VueHome',
     components: {
         consultCount,
         onlineConsultant,
+        onlineSuperVisor,
         constructingPage,
+        todayStatistic,
+        weekStatistic,
     },
     data() {
         return {
@@ -52,6 +63,6 @@ export default {
 
 
 .grid-content {
-    min-height: 90px;
+    min-height: 200px;
 }
 </style>

@@ -8,6 +8,9 @@ import 'element-plus/dist/index.css'
 import Store from './store'
 import {IM_APP_ID} from "@/IMconfig/im";
 
+import 'echarts';
+import VECharts from "vue-echarts";
+
 
 // 从v2.11.2起，SDK 支持了 WebSocket，推荐接入；v2.10.2及以下版本，使用 HTTP
 // v2.24.0起，SDK 支持使用本地审核插件
@@ -58,7 +61,7 @@ const app = createApp(App);
 app.config.globalProperties.$tim = tim;
 app.config.globalProperties.$TIM = TIM;
 
-app.use(ElementPlus).use(Store).use(Router).mount('#app')
+app.use(ElementPlus).use(Store).use(Router).component('v-chart', VECharts).mount('#app')
 
 
-createApp(App).use(ElementPlus).use(Store).use(Router).mount('#app')
+// createApp(App).use(ElementPlus).use(Store).use(Router).mount('#app')
