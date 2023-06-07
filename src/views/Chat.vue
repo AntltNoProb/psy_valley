@@ -1,15 +1,30 @@
 
 <template>
     <div style="padding: 10px">
-        <el-text>{{name}}</el-text>
+        <el-row type="flex" justify="center">
+            <p>{{name}}</p>
+        </el-row>
         <div style="margin: 10px 0">
-            <el-row v-for="(itemc,indexc) in recordContent" :key="indexc">
-                <el-col span="4"><el-avatar src="itemc.headUrl"/></el-col>
-                <el-col span="8">{{itemc.nickName}}</el-col>
-                <el-col>{{itemc.contactText}}</el-col>
-            </el-row>
+            <div v-for="(itemc,indexc) in recordContent" :key="indexc">
+                <el-row gutter="10" v-if = "itemc.mineMsg" type="flex" justify="end">
+                    <el-col span="12">
+                        <span style="word-break: break-word">
+                            {{itemc.contactText}}
+                        </span>
+                    </el-col>
+                    <el-col span="8">{{itemc.nickName}}</el-col>
+                    <el-col span="4"><el-avatar src="itemc.headUrl"/></el-col>
+                </el-row>
+                <el-row gutter="10" v-else type="flex" justify="start">
+                    <el-col span="4" ><el-avatar src="itemc.headUrl"/></el-col>
+                    <el-col span="8" >{{itemc.nickName}}</el-col>
+                    <el-col span="12" >
+                        <span style="word-break: break-word">{{itemc.contactText}}</span>
+                    </el-col>
+                </el-row>
+            </div>
             <el-row>
-                <el-input v-model="message" style="width: 80%" clearable />
+                <el-input v-model="message" style="width: 95%" clearable />
                 <el-button type="primary" style="margin-left: 7px" @click="submit">send</el-button>
             </el-row>
         </div>
@@ -43,25 +58,25 @@ export default {
                 {
                     'mineMsg': true,
                     'headUrl': null,
-                    'nickName': "fine",
+                    'nickName': "Tom",
                     'contactText':"xiatounan",
                 },
                 {
                     'mineMsg': true,
                     'headUrl': null,
-                    'nickName': "fine",
+                    'nickName': "Tom",
                     'contactText':"xiatounan",
                 },
                 {
                     'mineMsg': true,
                     'headUrl': null,
-                    'nickName': "fine",
-                    'contactText':"xiatounan",
+                    'nickName': "Tom",
+                    'contactText':"xiatounanxiatounaunan",
                 },
                 {
                     'mineMsg': true,
                     'headUrl': null,
-                    'nickName': "fine",
+                    'nickName': "Tom",
                     'contactText':"xiatounan",
                 },
 
@@ -143,108 +158,3 @@ export default {
     }
 }
 </script>
-
-<style scoped>
-
-.chat-content{
-    width: 100%;
-    height: 200px;
-    padding: 20px;
-    .word{
-        display: flex;
-        margin-bottom: 20px;
-        img{
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-        }
-        .info{
-            margin-left: 10px;
-            .time{
-                font-size: 12px;
-                color: rgba(51,51,51,0.8);
-                margin: 0;
-                height: 20px;
-                line-height: 20px;
-                margin-top: -5px;
-            }
-            .info-content{
-                padding: 10px;
-                font-size: 14px;
-                background: #fff;
-                position: relative;
-                margin-top: 8px;
-            }
-            .info-content::before{
-                position: absolute;
-                left: -8px;
-                top: 8px;
-                content: '';
-                border-right: 10px solid #FFF;
-                border-top: 8px solid transparent;
-                border-bottom: 8px solid transparent;
-            }
-        }
-    }
-
-    .word-my{
-        display: flex;
-        justify-content:flex-end;
-        margin-bottom: 20px;
-        img{
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-        }
-        .info{
-            width: 90%;
-            margin-left: 10px;
-            text-align: right;
-            .time{
-                font-size: 12px;
-                color: rgba(51,51,51,0.8);
-                margin: 0;
-                height: 20px;
-                line-height: 20px;
-                margin-top: -5px;
-                margin-right: 10px;
-            }
-            .info-content{
-                max-width: 70%;
-                padding: 10px;
-                font-size: 14px;
-                float: right;
-                margin-right: 10px;
-                position: relative;
-                margin-top: 8px;
-                background: #A3C3F6;
-                text-align: left;
-            }
-            .info-content::after{
-                position: absolute;
-                right: -8px;
-                top: 8px;
-                content: '';
-                border-left: 10px solid #A3C3F6;
-                border-top: 8px solid transparent;
-                border-bottom: 8px solid transparent;
-            }
-        }
-    }
-}
-.footViewStyle{
-    background-color: #F4F5F6;
-    width: 100%;
-    height: 60px;
-    position: fixed;
-    bottom: 0px;
-}
-.topViewStyle{
-    background-color: #A3C3F6;
-    text-align: center;
-    width: 100%;
-    height: 80px;
-    position: fixed;
-    top: 100px;
-}
-</style>

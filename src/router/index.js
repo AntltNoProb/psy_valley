@@ -89,24 +89,24 @@ const router = createRouter({
     routes
 })
 
-// router.beforeEach((to, from, next) => {
-//     if (to.path === '/login') {
-//         next();
-//     } else {
-//         let token = localStorage.getItem('Authorization');
-//         if (token === 'null' || token === '') {
-//             next('/login');
-//         } else {
-//             let user = sessionStorage.getItem('user')
-//             if(!user){
-//                 next('/login')
-//             }
-//             next()
-//             if(to.meta.roles.includes(JSON.parse(user).authority)){
-//                 next()	//放行
-//             }
-//         }
-//     }
-//     next('/login')
-// });
+router.beforeEach((to, from, next) => {
+    if (to.path === '/login') {
+        next();
+    } else {
+        let token = localStorage.getItem('Authorization');
+        if (token === 'null' || token === '') {
+            next('/login');
+        } else {
+            let user = sessionStorage.getItem('user')
+            if(!user){
+                next('/login')
+            }
+            next()
+            if(to.meta.roles.includes(JSON.parse(user).authority)){
+                next()	//放行
+            }
+        }
+    }
+    next('/login')
+});
 export default router

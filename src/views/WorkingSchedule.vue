@@ -179,7 +179,7 @@ export default {
     computed: {
         timeStr() {
             return this.selectDate ?
-                this.selectDate.getMonth() + '月' + this.selectDate.getDate() + '日' :
+                this.selectDate.getMonth()+1 + '月' + this.selectDate.getDate() + '日' :
                 '';
         },
         scheduleTypeLoc() {

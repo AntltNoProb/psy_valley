@@ -33,10 +33,10 @@ export default {
         }
     },
     created() {
-        // let userinfo = sessionStorage.getItem("user")
-        // this.user = JSON.parse(userinfo)
-        // console.log(userinfo)
-        sessionStorage.setItem("user", JSON.stringify(this.user))
+        let userinfo = sessionStorage.getItem("user")
+        this.user = JSON.parse(userinfo)
+        console.log(userinfo)
+        //sessionStorage.setItem("user", JSON.stringify(this.user))
     }
 }
 </script>
