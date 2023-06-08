@@ -31,7 +31,7 @@
                         @blur="onEditorBlur"
                         @focus="onEditorFocus"
                         @change="onEditorChange">
-                        >
+                    >
                 </quill-editor>
             </div>
         </div>
@@ -90,7 +90,7 @@ const toolbarOptions = [
 
 export default {
     // eslint-disable-next-line vue/multi-word-component-names
-    name: "Chat",
+    name: "dialog",
     components: {
         quillEditor
     },
@@ -122,48 +122,6 @@ export default {
                     'mineMsg': true,
                     'headUrl':"head001.png",
                     'nickName': "Tom",
-                    'contactText':"xiatounan",
-                },
-                {
-                    'mineMsg': false,
-                    'headUrl': "head002.png",
-                    'nickName': "jack",
-                    'contactText':"xiatounan",
-                },
-                {
-                    'mineMsg': false,
-                    'headUrl': "head002.png",
-                    'nickName': "jack",
-                    'contactText':"xiatounan",
-                },
-                {
-                    'mineMsg': true,
-                    'headUrl': "head001.png",
-                    'nickName': "Tom",
-                    'contactText':"xiatounan",
-                },
-                {
-                    'mineMsg': false,
-                    'headUrl': "head002.png",
-                    'nickName': "jack",
-                    'contactText':"xiatounan",
-                },
-                {
-                    'mineMsg': false,
-                    'headUrl': "head002.png",
-                    'nickName': "jack",
-                    'contactText':"xiatounan",
-                },
-                {
-                    'mineMsg': true,
-                    'headUrl': "head001.png",
-                    'nickName': "Tom",
-                    'contactText':"xiatounan",
-                },
-                {
-                    'mineMsg': false,
-                    'headUrl': "head002.png",
-                    'nickName': "jack",
                     'contactText':"xiatounan",
                 },
 
@@ -261,77 +219,77 @@ export default {
 </script>
 <style scoped lang="scss">
 .editor {
-    height: 200px;
+  height: 200px;
 }
 </style>
 <style>
-    body {
-        margin: 0;
-        padding: 0;
-    }
-    /*左三角*/
-    .tip-left {
-        margin: 20px;
-        padding: 5px;
-        width: 300px;
-        height: 60px;
-        border: 2px solid #f99;
-        position: relative;
-        background-color: #FFF;
-        /*设置圆角*/
-        -webkit-border-radius: 5px;
-        -moz-border-radius: 5px;
-        border-radius: 5px;
-    }
+body {
+    margin: 0;
+    padding: 0;
+}
+/*左三角*/
+.tip-left {
+    margin: 20px;
+    padding: 5px;
+    width: 300px;
+    height: 60px;
+    border: 2px solid #f99;
+    position: relative;
+    background-color: #FFF;
+    /*设置圆角*/
+    -webkit-border-radius: 5px;
+    -moz-border-radius: 5px;
+    border-radius: 5px;
+}
 
-    .tip-left:before, .tip-left:after {
-        content: "";
-        display: block;
-        border-width: 15px;
-        position: absolute;
-        left: -30px;
-        top: 20px;
-        border-style: dashed solid solid dashed;
-        border-color: transparent #f99 transparent transparent;
-        font-size: 0;
-        line-height: 0;
-    }
+.tip-left:before, .tip-left:after {
+    content: "";
+    display: block;
+    border-width: 15px;
+    position: absolute;
+    left: -30px;
+    top: 20px;
+    border-style: dashed solid solid dashed;
+    border-color: transparent #f99 transparent transparent;
+    font-size: 0;
+    line-height: 0;
+}
 
-    .tip-left:after {
-        left: -27px;
-        border-color: transparent #FFF transparent transparent;
-    }
+.tip-left:after {
+    left: -27px;
+    border-color: transparent #FFF transparent transparent;
+}
 
-    /*右三角*/
-    .tip-right {
-        margin: 20px;
-        padding: 5px;
-        width: 300px;
-        height: 60px;
-        border: 2px solid #0ff;
-        position: relative;
-        background-color: #FFF;
-        /*设置圆角*/
-        -webkit-border-radius: 5px;
-        -moz-border-radius: 5px;
-        border-radius: 5px;
-    }
+/*右三角*/
+.tip-right {
+    margin: 20px;
+    padding: 5px;
+    width: 300px;
+    height: 60px;
+    border: 2px solid #0ff;
+    position: relative;
+    background-color: #FFF;
+    /*设置圆角*/
+    -webkit-border-radius: 5px;
+    -moz-border-radius: 5px;
+    border-radius: 5px;
+}
 
-    .tip-right:before, .tip-right:after {
-        content: "";
-        display: block;
-        border-width: 15px;
-        position: absolute;
-        right: -30px;
-        top: 20px;
-        border-style: dashed solid solid dashed;
-        border-color: transparent transparent transparent #0ff;
-        font-size: 0;
-        line-height: 0;
-    }
+.tip-right:before, .tip-right:after {
+    content: "";
+    display: block;
+    border-width: 15px;
+    position: absolute;
+    right: -30px;
+    top: 20px;
+    border-style: dashed solid solid dashed;
+    border-color: transparent transparent transparent #0ff;
+    font-size: 0;
+    line-height: 0;
+}
 
-    .tip-right:after {
-        right: -27px;
-        border-color: transparent transparent transparent #FFF;
-    }
+.tip-right:after {
+    right: -27px;
+    border-color: transparent transparent transparent #FFF;
+}
 </style>

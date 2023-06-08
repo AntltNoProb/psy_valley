@@ -1,12 +1,13 @@
 import { createApp } from 'vue'
 import 'element-plus/dist/index.css'
-
 import App from './App.vue'
 import ElementPlus from 'element-plus'
 import Router from './router'
 import 'element-plus/dist/index.css'
 import Store from './store'
 import {IM_APP_ID} from "@/IMconfig/im";
+
+import Quill from "vue-quill-editor"
 
 import 'echarts';
 import VECharts from "vue-echarts";
@@ -61,7 +62,7 @@ const app = createApp(App);
 app.config.globalProperties.$tim = tim;
 app.config.globalProperties.$TIM = TIM;
 
-app.use(ElementPlus).use(Store).use(Router).component('v-chart', VECharts).mount('#app')
+app.use(ElementPlus).use(Quill).use(Store).use(Router).component('v-chart', VECharts).mount('#app')
 
 
 // createApp(App).use(ElementPlus).use(Store).use(Router).mount('#app')

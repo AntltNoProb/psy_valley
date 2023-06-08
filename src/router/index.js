@@ -21,13 +21,6 @@ const routes = [
                     roles: ['Consultant']
                 },
             },
-            {path: 'consult-online',
-                name: 'ConsultOnline',
-                component: () => import('@/views/ConsultOnline.vue'), // to modify
-                meta: {
-                    roles: ['Consultant']
-                },
-            },
              {path: 'consult-record',
                 name: 'consult-record',
                 component: ()=>import('@/views/ConsultRecord.vue'),
@@ -60,7 +53,7 @@ const routes = [
                 name: 'counselor-management',
                 component: ()=>import('@/views/CounselorManagement.vue'),
                 meta: {
-                             roles: ['SystemManager','Supervisors']
+                    roles: ['SystemManager','Supervisors']
                 },
             },
 
@@ -81,7 +74,8 @@ const routes = [
         ]
     },
     {path: '/login', name: 'login', component: ()=>import('@/views/Login.vue')},
-    {path: '/chat', name: 'chat', component: ()=>import('@/views/Chat.vue')}
+    {path: '/chat', name: 'chat', component: ()=>import('@/views/Chat.vue')},
+    {path: '/dialog', name: 'dialog',component:()=>import ('@/views/Dialog.vue')}
 ]
 
 const router = createRouter({

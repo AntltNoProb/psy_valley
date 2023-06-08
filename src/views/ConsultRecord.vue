@@ -16,6 +16,7 @@
                     start-placeholder="开始日期"
                     end-placeholder="结束日期"
                     @change="dateFormat"
+
                 />
             </el-config-provider>
             <el-popconfirm title="确认要全部导出吗?" @confirm="exportAll">
@@ -26,11 +27,11 @@
         </div>
         <el-table :data="tableData" border stripe style="width: 100%" @selection-change="handleSelectionChange">
             <el-table-column type="selection" width="55" />
-            <el-table-column prop="counselor" label="咨询师"/>
-            <el-table-column prop="visitor" label="访客" />
+            <el-table-column prop="c_name" label="咨询师"/>
+            <el-table-column prop="v_name" label="访客" />
             <el-table-column prop="duration" label="咨询时长" />
-            <el-table-column prop="evaluate" label="咨询评价" sortable/>
-            <el-table-column prop="date" label="咨询日期"  sortable/>
+            <el-table-column prop="level" label="咨询评价" sortable/>
+            <el-table-column prop="starttime" label="咨询日期"  sortable/>
             <el-table-column label="操作">
                 <template #default="scope">
                     <el-button type="primary" @click="consultDetails">查看详情</el-button>
@@ -79,7 +80,7 @@ export default {
         }
     },
     created(){
-
+        this.load()
     },
     mounted(){
         document.title='查询记录'
@@ -89,6 +90,7 @@ export default {
         dateFormat(picker) {
             this.param.startTime = picker[0].toString()
             this.param.endTime = picker[1].toString()
+            this.load()
         },
 
         load(){
@@ -96,12 +98,13 @@ export default {
                 params:{
                     pageNum: this.currentPage,
                     pageSize:10,
-                    visitor: this.searchVisitor,
-                    counselor: this.searchCounselor,
+                    visitorName: this.searchVisitor,
+                    counselorName: this.searchCounselor,
                     startDate: this.param.startTime,
                     endDate: this.param.endTime,
                 },
             }).then(res => {
+                console.log(res)
                 this.tableData=res.data.records
                 this.total = res.data.total
             })
