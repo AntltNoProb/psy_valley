@@ -16,9 +16,16 @@ const routes = [
              },
             {path: 'chat',
                 name: 'Chat',
-                component: () => import('@/views/Chat.vue'), // to modify
+                component: () => import('@/views/ChatPart.vue'), // to modify
                 meta: {
                     roles: ['Consultant']
+                },
+            },
+            {path: '/assist',
+                name: 'assist',
+                component:()=>import ('@/views/AssistPart.vue'),
+                meta: {
+                    roles: ['Consultant','Supervisors']
                 },
             },
              {path: 'consult-record',
@@ -74,8 +81,6 @@ const routes = [
         ]
     },
     {path: '/login', name: 'login', component: ()=>import('@/views/Login.vue')},
-    {path: '/chat', name: 'chat', component: ()=>import('@/views/Chat.vue')},
-    {path: '/dialog', name: 'dialog',component:()=>import ('@/views/Dialog.vue')}
 ]
 
 const router = createRouter({

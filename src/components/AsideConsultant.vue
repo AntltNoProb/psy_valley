@@ -26,12 +26,12 @@
                 <span>会话管理</span>
             </template>
             <el-menu-item-group title="咨询">
-                <el-menu-item v-for="(o, cnt) in currentVisitors" :key="o" @click="$router.push('/Chat')">
+                <el-menu-item v-for="(o, cnt) in currentVisitors" :key="o" @click="$router.push('/chat')">
                     <span>{{visitorNames[cnt]}}</span>
                 </el-menu-item>
             </el-menu-item-group>
             <el-menu-item-group title="求助">
-                <el-menu-item v-for="(o, inx) in currentSupervisor" :key="o" @click="$router.push('/Dialog')">
+                <el-menu-item v-for="(o, inx) in currentSupervisor" :key="o" @click="$router.push('/assist')">
                     <span>{{SupervisorNames[inx]}}</span>
                 </el-menu-item>
             </el-menu-item-group>
@@ -53,8 +53,8 @@ export default {
         return{
             currentVisitors: 3,
             visitorNames:["wang", "wen", "hai"],
-            currentSupervisor:1,
-            SupervisorNames:['wu']
+            currentSupervisor:2,
+            SupervisorNames:['wu','xu']
         }
     },
     mounted() {
