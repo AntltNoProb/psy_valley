@@ -29,7 +29,10 @@ export default {
     },
     data(){
         return{
-            user: {name:'a', authority:'SystemManager'}
+            user: {},
+            // user: {name:'a', authority:'SystemManager'},
+            // user: {name:'c', authority:'Counselor'},
+            // user: {name:'s', authority:'SuperVisor'},
         }
     },
     created() {

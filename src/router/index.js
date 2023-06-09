@@ -9,7 +9,14 @@ const routes = [
         children:[
              {path: 'home',
                  name: 'home',
-                 component: () => import('@/views/HomeAdmin.vue'), // to modify 
+                 component: () => {
+                    let user = sessionStorage.getItem('user');
+                    let authority = JSON.parse(user).authority;
+                    if (authority == 'SystemManager') return import('@/views/HomeAdmin.vue');
+                    if (authority == 'Consultant') return import('@/views/HomeCounselor.vue');
+                    return import('@/views/HomeSupervisor.vue');
+                }, // to modify 
+                // component: () => import('@/views/HomeAdmin.vue'), 
                  meta: {
                      roles: ['SystemManager','Consultant','Supervisors']
                  },
