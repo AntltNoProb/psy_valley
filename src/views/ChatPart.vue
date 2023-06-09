@@ -3,8 +3,8 @@
         <el-row type="flex" justify="center" :style="{backgroundColor: 'pink'}">
             <p>{{name}}</p>
         </el-row>
-        <div style="width:100%">
-            <el-scrollbar height="700px">
+        <div style="width:100%" :style="{height: slbHeight}">
+            <el-scrollbar>
                 <div v-for="(itemc,indexc) in recordContent" :key="indexc">
                     <el-row gutter="10" v-if = "itemc.mineMsg" type="flex" justify="end">
                         <el-col span="12">
@@ -96,6 +96,8 @@ export default {
     },
     data(){
         return {
+            slbHeight:'',
+            clientHeight:'',
             content: '',//聊天的内容asdasd
             editorOption: {
                 modules: {
@@ -173,7 +175,9 @@ export default {
     },
 
     watch:{
-
+        clientHeight(){     //如果clientHeight 发生改变，这个函数就会运行
+            this.changeFixed(this.clientHeight)
+        },
         imReady(value){
             if(value){
                 this.getMessageList({userId:'lihua'});
@@ -183,7 +187,18 @@ export default {
     computed:{
         ...mapState(['imReady', 'messageList'])
     },
+    mounted() {
+        this.clientHeight = `${document.documentElement.clientHeight}`;//获取浏览器可视区域高度
+        let that = this;
+        window.onresize = function(){
+            this.clientHeight =  `${document.documentElement.clientHeight}`;
+            that.slbHeight = this.clientHeight - 375 + 'px';
+        }
+    },
     methods :{
+        changeFixed(clientHeight){
+            this.slbHeight = clientHeight -375 + 'px';
+        },
         onEditorBlur (e) {
             console.log('onEditorBlur: ', e)
         },

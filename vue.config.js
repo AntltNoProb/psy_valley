@@ -2,14 +2,12 @@
 
 module.exports = {
   devServer: {
-    // ...
-
     // 跨域配置
     proxy: {
       // 接口是以 /api 开头的需要代理
       '/api': {
-        target: 'http://192.168.31.172:8080', // 代理接口地址。实际请求接口地址会是：http://49.52.4.17/api/xxx/xxx
-        //
+        target: 'http://49.52.4.17:8080', // 代理接口地址。实际请求接口地址会是：/api/xxx/xxx
+        //'http://192.168.31.172:8080'
         changeOrigin: true, // 默认false，是否需要改变原始主机头为目标URL
         ws: true, // 是否代理websockets
         pathRewrite: {

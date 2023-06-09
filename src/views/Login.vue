@@ -1,5 +1,5 @@
 <template>
-    <div style="width: 100%;height: 100vh;background-color: lavenderblush; overflow: hidden"  @keyup.enter="login">
+    <div class="login" @keyup.enter="login">
         <div style="width: 400px;margin: 150px auto">
             <div style="font-size: 30px;text-align: center; padding: 30px 0">欢迎登录心声谷</div>
             <el-form ref="form" :model="form" size="normal" :rules="rules">
@@ -18,7 +18,7 @@
                     </el-input>
                 </el-form-item>
                 <el-form-item>
-                    <el-button @click="onShow" type="warning" style="width:400px;"> 开始验证 </el-button>
+                    <el-button @click="onShow" type="success" style="width:400px;"> 开始验证 </el-button>
                     <VerifyCode :show="isShow" @success="onSuccess" @close="onClose" />
                 </el-form-item>
                 <el-form-item>
@@ -136,6 +136,15 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+.login{
+    width: 100%;
+    height: 100vh;
+    background-image: url("~@/assets/background.png");
+    background-size: cover;
+    background-position: center;
+    position: relative;
+    overflow: hidden
+}
 
 .login-box {
   border: 1px solid #DCDFE6;
