@@ -51,11 +51,7 @@
                     <el-table-column prop="w_name" />
                     <el-table-column align="right">
                         <template #default="scope">
-                            <el-popconfirm 
-                                title="确定要取消此排班吗?"
-                                confirm-button-text="确定"
-                                cancel-button-text="取消"
-                            >
+                            <el-popconfirm title="确定要取消此排班吗?" confirm-button-text="确定" cancel-button-text="取消">
                                 <template #reference>
                                     <el-button size="small" type="danger" @click="onRemove(scope.$index, scope.row)">
                                         取消排班
@@ -116,7 +112,7 @@ export default {
             },
             scheduleType: "counselor",
             selectDate: new Date(),
-            scheduleData: [{counselor:[{w_name:'a', w_username:'a'}], supervisor:[]}],
+            scheduleData: [{ counselor: [{ w_name: 'a', w_username: 'a' }], supervisor: [] }],
             dialogVisible: false,
             newSchedule: '',
             availableSchedule: [],
@@ -293,7 +289,9 @@ export default {
         },
         scheduleTypeLoc() {
             return this.scheduleType == 'counselor' ? '咨询师' : '督导';
-        }
+        },
+
+    },
     created() {
         this.loadMonthData(this.selectDate);
     },
