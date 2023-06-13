@@ -1,7 +1,7 @@
 import { createStore } from 'vuex'
-import TIM from "tim-js-sdk";
-import {IM_APP_ID} from "@/IMconfig/im";
-
+// import TIM from "tim-js-sdk";
+// import {IM_APP_ID} from "@/IMconfig/im";
+import { globaltim } from '../main.js';
 export default createStore({
     state: {
         Authorization: localStorage.getItem('Authorization') ? localStorage.getItem('Authorization') : '',// 存储token
@@ -39,12 +39,14 @@ export default createStore({
         //payload传递userId
 
         async getMessageList(store, payload){
-            // 打开某个会话时，第一次拉取消息列表，注意！第一次拉取时不要传入 nextReqMessageID
-            let options = {
-                SDKAppID: IM_APP_ID // 接入时需要将0替换为您的即时通信 IM 应用的 SDKAppID
-            };
-            let tim = TIM.create(options);
-            let imResponse = await tim.getMessageList({conversationID: 'C2C'+ payload.userId});
+            console.log(payload.userId);
+            console.log(globaltim, "globatim============");
+            // // 打开某个会话时，第一次拉取消息列表，注意！第一次拉取时不要传入 nextReqMessageID
+            // let options = {
+            //     SDKAppID: IM_APP_ID // 接入时需要将0替换为您的即时通信 IM 应用的 SDKAppID
+            // };
+            // let tim = TIM.create(options);
+            let imResponse = await globaltim.getMessageList({conversationID: 'C2C'+ payload.userId});
             console.log(imResponse);
             store.commit('updateMessageList', imResponse.data.messageList);
         }

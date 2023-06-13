@@ -1,5 +1,6 @@
 // es
 import LibGenerateTestUserSig from './lib-generate-test-usersig-es.min.js';
+import {IM_APP_ID, IM_APP_SECRET} from "@/IMconfig/im";
 // umd
 // import * as LibGenerateTestUserSig from './lib-generate-test-usersig-umd.min.js';
 
@@ -50,8 +51,8 @@ const EXPIRETIME = 604800;
  */
 
 function genTestUserSig(userID) {
-  let SDKAppID = 1400812784;
-  const generator = new LibGenerateTestUserSig(1400812784, 'd13abb542e7242071555296eb5fec115d4057c803c5546a0514cd1ffb472442a', EXPIRETIME);
+  let SDKAppID = IM_APP_ID;
+  const generator = new LibGenerateTestUserSig(SDKAppID, IM_APP_SECRET, EXPIRETIME);
   const userSig = generator.genTestUserSig(userID);
   return {
     SDKAppID,

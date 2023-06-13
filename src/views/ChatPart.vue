@@ -1,24 +1,38 @@
 <template>
     <div style="padding: 10px">
         <el-row type="flex" justify="center" :style="{backgroundColor: 'pink'}">
-            <p>{{name}}</p>
+            <p>{{sendToName}}</p>
         </el-row>
         <div style="width:100%" :style="{height: slbHeight}">
             <el-scrollbar>
-                <div v-for="(itemc,indexc) in recordContent" :key="indexc">
-                    <el-row gutter="10" v-if = "itemc.mineMsg" type="flex" justify="end">
+                <div v-for="(itemc,indexc) in messageList" :key="indexc">
+                    <el-row gutter="10" v-if = "itemc.flow === 'in'" type="flex" justify="end">
                         <el-col span="12">
-                            <div class="tip-right">{{itemc.contactText}}</div>
+                            <div class="tip-right">{{itemc.payload.text}}</div>
                         </el-col>
-                        <el-col span="8">{{itemc.nickName}}</el-col>
+                        <el-col span="8">{{itemc.from}}</el-col>
                         <el-col span="4"><el-avatar shape="square" :size="50" src="itemc.headUrl" /></el-col>
                     </el-row>
                     <el-row gutter="10" v-else type="flex" justify="start">
                         <el-col span="4" ><el-avatar shape="square" :size="50" src="itemc.headUrl"/></el-col>
-                        <el-col span="8" >{{itemc.nickName}}</el-col>
-                        <div class="tip-left">{{itemc.contactText}}</div>
+                        <el-col span="8" >{{itemc.from}}</el-col>
+                        <div class="tip-left">{{itemc.payload.text}}</div>
                     </el-row>
                 </div>
+<!--              <div v-for="(itemc,indexc) in recordContent" :key="indexc">-->
+<!--                <el-row gutter="10" v-if = "itemc.mineMsg" type="flex" justify="end">-->
+<!--                  <el-col span="12">-->
+<!--                    <div class="tip-right">{{itemc.contactText}}</div>-->
+<!--                  </el-col>-->
+<!--                  <el-col span="8">{{itemc.nickName}}</el-col>-->
+<!--                  <el-col span="4"><el-avatar shape="square" :size="50" src="itemc.headUrl" /></el-col>-->
+<!--                </el-row>-->
+<!--                <el-row gutter="10" v-else type="flex" justify="start">-->
+<!--                  <el-col span="4" ><el-avatar shape="square" :size="50" src="itemc.headUrl"/></el-col>-->
+<!--                  <el-col span="8" >{{itemc.nickName}}</el-col>-->
+<!--                  <div class="tip-left">{{itemc.contactText}}</div>-->
+<!--                </el-row>-->
+<!--              </div>-->
             </el-scrollbar>
         </div>
         <div>
@@ -36,13 +50,13 @@
             </div>
         </div>
         <el-row type="flex" justify="end">
-            <el-button type="success" size="large" @click="send">发送</el-button>
+            <el-button type="success" size="large" @click="sendMsg">发送</el-button>
         </el-row>
     </div>
 </template>
 
 <script>
-import {genTestUserSig} from '@/IMdebug/GenerateTestUserSig'
+// import {genTestUserSig} from '@/IMdebug/GenerateTestUserSig'
 import {mapActions, mapMutations, mapState} from "vuex";
 import {IM_APP_ID} from "@/IMconfig/im";
 // 引入样式和quillEditor
@@ -56,6 +70,8 @@ import 'quill/dist/quill.bubble.css'
 
 import TIM from "tim-js-sdk";
 import {quillEditor} from "vue-quill-editor/src";
+import store from "@/store";
+// import {useRoute} from "vue-router";
 
 const toolbarOptions = [
     // 加粗 斜体 下划线 删除线 -----['bold', 'italic', 'underline', 'strike']
@@ -94,11 +110,12 @@ export default {
     components: {
         quillEditor
     },
+
     data(){
-        return {
+      return {
             slbHeight:'',
             clientHeight:'',
-            content: '',//聊天的内容asdasd
+            content: '123',//聊天的内容asdasd
             editorOption: {
                 modules: {
                     toolbar: toolbarOptions
@@ -108,69 +125,66 @@ export default {
                 // Some Quill optiosn...
             },
 
-            name:"聊天对象",
+            sendToName: history.state.name ,
             message:'',
             userId: '',
-            msg: '',
-            indexc: 1,
-            recordContent:[
-                {
-                    'mineMsg': false,
-                    'headUrl': "head002.png",
-                    'nickName': "jack",
-                    'contactText':"xiatounan",
-                },
-                {
-                    'mineMsg': true,
-                    'headUrl':"head001.png",
-                    'nickName': "Tom",
-                    'contactText':"xiatounan",
-                },
-                {
-                    'mineMsg': false,
-                    'headUrl': "head002.png",
-                    'nickName': "jack",
-                    'contactText':"xiatounan",
-                },
-                {
-                    'mineMsg': false,
-                    'headUrl': "head002.png",
-                    'nickName': "jack",
-                    'contactText':"xiatounan",
-                },
-                {
-                    'mineMsg': true,
-                    'headUrl': "head001.png",
-                    'nickName': "Tom",
-                    'contactText':"xiatounan",
-                },
-                {
-                    'mineMsg': false,
-                    'headUrl': "head002.png",
-                    'nickName': "jack",
-                    'contactText':"xiatounan",
-                },
-                {
-                    'mineMsg': false,
-                    'headUrl': "head002.png",
-                    'nickName': "jack",
-                    'contactText':"xiatounan",
-                },
-                {
-                    'mineMsg': true,
-                    'headUrl': "head001.png",
-                    'nickName': "Tom",
-                    'contactText':"xiatounan",
-                },
-                {
-                    'mineMsg': false,
-                    'headUrl': "head002.png",
-                    'nickName': "jack",
-                    'contactText':"xiatounan",
-                },
-
-            ],
-
+            indexc: 1
+            // recordContent:[
+            //     {
+            //         'mineMsg': false,
+            //         'headUrl': "head002.png",
+            //         'nickName': "jack",
+            //         'contactText':"xiatounan",
+            //     },
+            //     {
+            //         'mineMsg': true,
+            //         'headUrl':"head001.png",
+            //         'nickName': "Tom",
+            //         'contactText':"xiatounan",
+            //     },
+            //     {
+            //         'mineMsg': false,
+            //         'headUrl': "head002.png",
+            //         'nickName': "jack",
+            //         'contactText':"xiatounan",
+            //     },
+            //     {
+            //         'mineMsg': false,
+            //         'headUrl': "head002.png",
+            //         'nickName': "jack",
+            //         'contactText':"xiatounan",
+            //     },
+            //     {
+            //         'mineMsg': true,
+            //         'headUrl': "head001.png",
+            //         'nickName': "Tom",
+            //         'contactText':"xiatounan",
+            //     },
+            //     {
+            //         'mineMsg': false,
+            //         'headUrl': "head002.png",
+            //         'nickName': "jack",
+            //         'contactText':"xiatounan",
+            //     },
+            //     {
+            //         'mineMsg': false,
+            //         'headUrl': "head002.png",
+            //         'nickName': "jack",
+            //         'contactText':"xiatounan",
+            //     },
+            //     {
+            //         'mineMsg': true,
+            //         'headUrl': "head001.png",
+            //         'nickName': "Tom",
+            //         'contactText':"xiatounan",
+            //     },
+            //     {
+            //         'mineMsg': false,
+            //         'headUrl': "head002.png",
+            //         'nickName': "jack",
+            //         'contactText':"xiatounan",
+            //     },
+            // ],
         }
     },
 
@@ -180,7 +194,8 @@ export default {
         },
         imReady(value){
             if(value){
-                this.getMessageList({userId:'lihua'});
+                this.getMessageList({userId:name});
+                console.log(this.getMessageList({userId: name}));
             }
         }
     },
@@ -212,46 +227,52 @@ export default {
         },
 
         ...mapActions(['getMessageList']),
-        ...mapMutations(['updateMySendMsg']),
-        async loginHandler(){
-            console.log(this.userId);
-            let userID = this.userId;
-            let userSig = genTestUserSig(userID).userSig; //签名信息
-            console.log(userSig, 'userSig==============================');
-            try {
-                let options = {
-                    SDKAppID: IM_APP_ID // 接入时需要将0替换为您的即时通信 IM 应用的 SDKAppID
-                };
-                let tim = TIM.create(options);
-                console.log(tim);
-                let response = await tim.login({userID: userID, userSig: userSig});
-                console.log(response, '登录后的信息===================================');
-            } catch (e){
-                console.log(e, '登录错误');
-            }
-        },
-        senMsg(){
+        ...mapMutations(['updateMySendMsg', 'updateIMStatus']),
+        // async loginHandler(){
+        //     console.log(this.userId);
+        //     let userID = this.userId;
+        //     let userSig = genTestUserSig(userID).userSig; //签名信息
+        //     console.log(userSig, 'userSig==============================');
+        //     try {
+        //         let options = {
+        //             SDKAppID: IM_APP_ID // 接入时需要将0替换为您的即时通信 IM 应用的 SDKAppID
+        //         };
+        //         let tim = TIM.create(options);
+        //         console.log(tim);
+        //         let response = await tim.login({userID: userID, userSig: userSig});
+        //         console.log(response, '登录后的信息===================================');
+        //     } catch (e){
+        //         console.log(e, '登录错误');
+        //     }
+        // },
+        sendMsg(){
+            console.log(this.content, 'content=======================');
             let options = {
                 SDKAppID: IM_APP_ID // 接入时需要将0替换为您的即时通信 IM 应用的 SDKAppID
             };
             let tim = TIM.create(options);
+            // console.log(messageList, 'MessageList================');
+            console.log('onSdkReady im ======================');
+            store.commit('updateIMStatus', true);
+
             if(!this.imReady){
                 alert('IM系统还未准备好');
                 return
             }
-            if(this.msg.trim() === ''){
+            if(this.content.trim() === ''){
                 alert('请输入聊天信息');
                 return
             }
             //发送消息
-            let message = tim.createTextMessage({
-                to: 'lihua',
+          console.log(this.sendToName,'sendToName===============');
+          let message = tim.createTextMessage({
+                to: this.sendToName,
                 conversationType: TIM.TYPES.CONV_C2C,
                 // 消息优先级，用于群聊（v2.4.2起支持）。如果某个群的消息超过了频率限制，后台会优先下发高优先级的消息，详细请参考：https://cloud.tencent.com/document/product/269/3663#.E6.B6.88.E6.81.AF.E4.BC.98.E5.85.88.E7.BA.A7.E4.B8.8E.E9.A2.91.E7.8E.87.E6.8E.A7.E5.88.B6)
                 // 支持的枚举值：TIM.TYPES.MSG_PRIORITY_HIGH, TIM.TYPES.MSG_PRIORITY_NORMAL（默认）, TIM.TYPES.MSG_PRIORITY_LOW, TIM.TYPES.MSG_PRIORITY_LOWEST
                 // priority: TIM.TYPES.MSG_PRIORITY_NORMAL,
                 payload: {
-                    text: this.msg
+                    text: this.content
                 },
                 // v2.20.0起支持C2C消息已读回执功能，如果您发消息需要已读回执，需购买旗舰版套餐，并且创建消息时将 needReadReceipt 设置为 true
                 needReadReceipt: true
@@ -265,7 +286,7 @@ export default {
                 console.log(imResponse, '发送成功');
                 // 发送的消息更新代仓库，页面使用聊天记录自动更新
                 this.updateMySendMsg(message);
-                this.msg = '';
+                this.content = '';
             }).catch(function(imError) {
                 // 发送失败
                 console.warn('sendMessage error:', imError);

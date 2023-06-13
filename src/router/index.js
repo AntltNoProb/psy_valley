@@ -22,7 +22,7 @@ const routes = [
                  },
              },
             {path: 'chat',
-                name: 'Chat',
+                name: 'chat',
                 component: () => import('@/views/ChatPart.vue'), // to modify
                 meta: {
                     roles: ['Consultant']

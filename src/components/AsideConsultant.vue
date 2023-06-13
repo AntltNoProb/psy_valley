@@ -29,7 +29,7 @@
                 <span>会话管理</span>
             </template>
             <el-menu-item-group title="咨询">
-                <el-menu-item v-for="(o, cnt) in currentVisitors" :key="o" @click="$router.push('/chat')">
+                <el-menu-item v-for="(o, cnt) in currentVisitors" :key="o" @click="$router.push({ name: 'chat', state: { name: visitorNames[cnt] }})">
                     <span>{{visitorNames[cnt]}}</span>
                 </el-menu-item>
             </el-menu-item-group>
@@ -54,8 +54,8 @@ export default {
     name:"AsideConsultant",
     data(){
         return{
-            currentVisitors: 3,
-            visitorNames:["wang", "wen", "hai"],
+            currentVisitors: 4,
+            visitorNames:["wang", "wen", "hai", "lihua"],
             currentSupervisor:2,
             SupervisorNames:['wu','xu']
         }
