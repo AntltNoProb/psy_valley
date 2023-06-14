@@ -60,7 +60,7 @@ export default {
     text-align: center;
     justify-content: space-between;
 }
-.fc-daygrid-day-number {
+.schedule-viewer .fc-daygrid-day-number {
     display:flex;
     justify-content: space-between;
     width: 100%;
