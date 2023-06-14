@@ -2,6 +2,7 @@
     <el-container class="home-container">
         <el-header><!-- 头部区 -->
             <div>
+                <el-avatar src="logo.png" shape="circle"></el-avatar>
                 <span>心声谷</span>
             </div>
             <el-dropdown >
