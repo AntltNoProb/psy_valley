@@ -59,10 +59,10 @@ tim.on(TIM.EVENT.MESSAGE_RECEIVED, onMessageReceived);
 
 
 const app = createApp(App);
-app.config.globalProperties.$tim = tim;
-app.config.globalProperties.$TIM = TIM;
-
+// app.config.globalProperties.$tim = tim;
+// app.config.globalProperties.$TIM = TIM;
+app.provide("globaltim", tim);
 app.use(ElementPlus).use(Quill).use(Store).use(Router).component('v-chart', VECharts).mount('#app')
-
+export const globaltim = tim;
 
 // createApp(App).use(ElementPlus).use(Store).use(Router).mount('#app')
