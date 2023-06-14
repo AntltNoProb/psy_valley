@@ -57,7 +57,7 @@
 
 <script>
 // import {genTestUserSig} from '@/IMdebug/GenerateTestUserSig'
-import {mapActions, mapMutations, mapState} from "vuex";
+// import {mapActions, mapMutations, mapState} from "vuex";
 // import {IM_APP_ID} from "@/IMconfig/im";
 // 引入样式和quillEditor
 import 'quill/dist/quill.core.css'
@@ -72,7 +72,8 @@ import TIM from "tim-js-sdk";
 import {quillEditor} from "vue-quill-editor/src";
 import {globaltim} from "@/main";
 import {genTestUserSig} from "@/IMdebug";
-import store from "@/store";
+import {ref} from "vue";
+// import store from "@/store";
 // import store from "@/store";
 // import {useRoute} from "vue-router";
 
@@ -114,6 +115,19 @@ export default {
         quillEditor
     },
     setup(){
+
+      let imReady=ref(false);
+      let messageList=ref([]);
+      let updateIMStatus=(payload)=>{
+        imReady.value=payload;
+      }
+      let updateOtherSendToMeMsg=(payload)=>{
+        if(payload.payload.text != null){
+          messageList.value = [...messageList.value, payload];
+        }
+        console.log(messageList.value, 'message======================');
+      }
+
       // TIM登录
       let userinfo = sessionStorage.getItem("user")
       let userID = JSON.parse(userinfo).username;
@@ -122,27 +136,33 @@ export default {
       console.log(userSig, 'userSig==============================');
 
       console.log(globaltim, 'globaltim==================');
+      updateIMStatus(true);
       try {
-        // let options = {
-        //   SDKAppID: IM_APP_ID // 接入时需要将0替换为您的即时通信 IM 应用的 SDKAppID
-        // };
-        // let tim = TIM.create(options);
-        // // eslint-disable-next-line no-unused-vars
-
-        //定义状态变量，标识IM是否准备好
         console.log('onSdkReady im ======================');
-        store.commit('updateIMStatus', true);
 
         let response = globaltim.login({userID: userID, userSig: userSig});
         console.log(response, '登录后的信息===================================');
-        // console.log('onSdkReady im ======================');
-        // store.commit('updateIMStatus', true);
-        //
-        // console.log(tim);
-        // let response = tim.login({userID: userID, userSig: userSig});
-        // console.log(response, '登录后的信息===================================');
       } catch (e){
         console.log(e, '登录错误');
+      }
+
+      // TIM监听接收消息
+      let onMessageReceived = function(event) {
+        // event.data - 存储 Message 对象的数组 - [Message]
+        console.log(event.data);
+        // 把发送来的消息更新到仓库
+        if(event.data[0]!=='') {
+          updateOtherSendToMeMsg(event.data[0])
+        }
+      };
+      //监听发送来的消息
+      globaltim.on(TIM.EVENT.MESSAGE_RECEIVED, onMessageReceived);
+
+      return{
+        imReady,
+        messageList,
+        updateIMStatus,
+        updateOtherSendToMeMsg
       }
     },
     data(){
@@ -158,12 +178,12 @@ export default {
                 placeholder: '请输入正文'
                 // Some Quill optiosn...
             },
-
             sendToName: history.state.name ,
             message:'',
             userId: '',
-            indexc: 1
-
+            indexc: 1,
+            // imReady: false,   //存储IM准备状态
+            // messageList: [], //存储聊天记录 1.之前和别人的 2.别人给我的 3.我给别人的
         }
     },
 
@@ -179,7 +199,7 @@ export default {
         // }
     },
     computed:{
-        ...mapState(['imReady', 'messageList'])
+        // ...mapState(['imReady', 'messageList'])
     },
     mounted() {
         this.clientHeight = `${document.documentElement.clientHeight}`;//获取浏览器可视区域高度
@@ -205,25 +225,38 @@ export default {
             console.log('onEditorChange: ', this.content)
         },
 
-        ...mapActions(['getMessageList']),
-        ...mapMutations(['updateMySendMsg', 'updateIMStatus']),
-        // async loginHandler(){
-        //     console.log(this.userId);
-        //     let userID = this.userId;
-        //     let userSig = genTestUserSig(userID).userSig; //签名信息
-        //     console.log(userSig, 'userSig==============================');
-        //     try {
-        //         let options = {
-        //             SDKAppID: IM_APP_ID // 接入时需要将0替换为您的即时通信 IM 应用的 SDKAppID
-        //         };
-        //         let tim = TIM.create(options);
-        //         console.log(tim);
-        //         let response = await tim.login({userID: userID, userSig: userSig});
-        //         console.log(response, '登录后的信息===================================');
-        //     } catch (e){
-        //         console.log(e, '登录错误');
-        //     }
+        // updateIMStatus(payload){
+        //   this.imReady = payload;
         // },
+
+        // updateMessageList(state, payload){
+        //   this.messageList = payload;
+        // },
+        //
+        // async getMessageList(store, payload){
+        //     console.log(payload.userId);
+        //     console.log(globaltim, "globatim============");
+        //     // // 打开某个会话时，第一次拉取消息列表，注意！第一次拉取时不要传入 nextReqMessageID
+        //     // let options = {
+        //     //     SDKAppID: IM_APP_ID // 接入时需要将0替换为您的即时通信 IM 应用的 SDKAppID
+        //     // };
+        //     // let tim = TIM.create(options);
+        //     let imResponse = await globaltim.getMessageList({conversationID: 'C2C'+ payload.userId});
+        //     console.log(imResponse);
+        //     this.updateMessageList(imResponse.data.messageList)
+        // },
+
+        updateMySendMsg(payload){
+          this.messageList = [...this.messageList, payload];
+        },
+
+        // updateOtherSendToMeMsg(payload){
+        //   if(payload.payload.text != null){
+        //     this.messageList = [...this.messageList, payload];
+        //   }
+        //   console.log(this.messageList, 'message======================');
+        // },
+
         sendMsg(){
             this.content = this.$refs.myLQuillEditor.quill.getText();
             console.log(globaltim, 'globaltim===================');
@@ -236,7 +269,7 @@ export default {
             // console.log(messageList, 'MessageList================');
             // console.log('onSdkReady im ======================');
             // store.commit('updateIMStatus', true);
-
+            console.log(this.imReady);
             if(!this.imReady){
                 alert('IM系统还未准备好');
                 return
@@ -246,8 +279,8 @@ export default {
                 return
             }
             //发送消息
-          console.log(this.sendToName,'sendToName===============');
-          let message = globaltim.createTextMessage({
+            console.log(this.sendToName,'sendToName===============');
+            let message = globaltim.createTextMessage({
                 to: this.sendToName,
                 conversationType: TIM.TYPES.CONV_C2C,
                 // 消息优先级，用于群聊（v2.4.2起支持）。如果某个群的消息超过了频率限制，后台会优先下发高优先级的消息，详细请参考：https://cloud.tencent.com/document/product/269/3663#.E6.B6.88.E6.81.AF.E4.BC.98.E5.85.88.E7.BA.A7.E4.B8.8E.E9.A2.91.E7.8E.87.E6.8E.A7.E5.88.B6)
@@ -274,6 +307,7 @@ export default {
                 console.warn('sendMessage error:', imError);
             });
         }
+
     }
 }
 </script>

@@ -18,7 +18,7 @@ import VECharts from "vue-echarts";
 import TIM from 'tim-js-sdk';
 import TIMUploadPlugin from 'tim-upload-plugin';
 import TIMProfanityFilterPlugin from 'tim-profanity-filter-plugin';
-import store from "./store";
+// import store from "./store";
 let options = {
     SDKAppID: IM_APP_ID // 接入时需要将0替换为您的即时通信 IM 应用的 SDKAppID
 };
@@ -41,27 +41,27 @@ tim.registerPlugin({'tim-profanity-filter-plugin': TIMProfanityFilterPlugin});
 let onSdkReady = function(event) {
     //定义状态变量，标识IM是否准备好
     console.log('onSdkReady im ======================');
-    store.commit('updateIMStatus', true);
+    // store.commit('updateIMStatus', true);
 };
 //监听ready事件
 tim.on(TIM.EVENT.SDK_READY, onSdkReady);
 
-let onMessageReceived = function(event) {
-    // event.data - 存储 Message 对象的数组 - [Message]
-    console.log(event.data);
-    // 把发送来的消息更新到仓库
-    if(event.data[0]!=''){
-        store.commit('updateOtherSendToMeMsg', event.data[0]);
-    }
-};
-//监听发送来的消息
-tim.on(TIM.EVENT.MESSAGE_RECEIVED, onMessageReceived);
+// let onMessageReceived = function(event) {
+//     // event.data - 存储 Message 对象的数组 - [Message]
+//     console.log(event.data);
+//     // 把发送来的消息更新到仓库
+//     if(event.data[0]!=='') {
+//         store.commit('updateOtherSendToMeMsg', event.data[0]);
+//     }
+// };
+// //监听发送来的消息
+// tim.on(TIM.EVENT.MESSAGE_RECEIVED, onMessageReceived);
 
 
 const app = createApp(App);
 // app.config.globalProperties.$tim = tim;
 // app.config.globalProperties.$TIM = TIM;
-app.provide("globaltim", tim);
+
 app.use(ElementPlus).use(Quill).use(Store).use(Router).component('v-chart', VECharts).mount('#app')
 export const globaltim = tim;
 
