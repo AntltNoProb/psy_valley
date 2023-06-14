@@ -53,7 +53,12 @@
                         <template #default="scope">
                             <el-popconfirm title="确定要取消此排班吗?" confirm-button-text="确定" cancel-button-text="取消">
                                 <template #reference>
-                                    <el-button size="small" type="danger" @click="onRemove(scope.$index, scope.row)">
+                                    <el-button 
+                                        size="small" 
+                                        type="danger" 
+                                        @click="onRemove(scope.$index, scope.row)"
+                                        :disabled="getButtonDisabled()"
+                                    >
                                         取消排班
                                     </el-button>
                                 </template>
@@ -63,7 +68,7 @@
                 </el-table>
                 <div class="add-container">
                     <el-button class="schedule-add-button" type="primary" @click="showAddWindow()"
-                        :disabled="selectDate == null">
+                        :disabled="getButtonDisabled()">
                         添加排班
                     </el-button>
                 </div>
@@ -316,6 +321,11 @@ export default {
             this.selectDate.getDate()
             ].join('-');
         },
+        getButtonDisabled() {
+            let user = sessionStorage.getItem('user');
+            return this.selectDate == null ||
+                !user || JSON.parse(user).authority != 'SystemManager'
+        },
     },
     computed: {
         timeStr() {
@@ -326,7 +336,7 @@ export default {
         scheduleTypeLoc() {
             return this.scheduleType == 'counselor' ? '咨询师' : '督导';
         },
-
+        
     },
     created() {
         this.loadMonthData(this.selectDate);
