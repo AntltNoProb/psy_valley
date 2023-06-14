@@ -58,7 +58,7 @@
 <script>
 // import {genTestUserSig} from '@/IMdebug/GenerateTestUserSig'
 import {mapActions, mapMutations, mapState} from "vuex";
-import {IM_APP_ID} from "@/IMconfig/im";
+// import {IM_APP_ID} from "@/IMconfig/im";
 // 引入样式和quillEditor
 import 'quill/dist/quill.core.css'
 import 'quill/dist/quill.snow.css'
@@ -70,6 +70,9 @@ import 'quill/dist/quill.bubble.css'
 
 import TIM from "tim-js-sdk";
 import {quillEditor} from "vue-quill-editor/src";
+import {globaltim} from "@/main";
+import {genTestUserSig} from "@/IMdebug";
+import store from "@/store";
 // import store from "@/store";
 // import {useRoute} from "vue-router";
 
@@ -110,6 +113,38 @@ export default {
     components: {
         quillEditor
     },
+    setup(){
+      // TIM登录
+      let userinfo = sessionStorage.getItem("user")
+      let userID = JSON.parse(userinfo).username;
+      console.log(userID);
+      let userSig = genTestUserSig(userID).userSig; //签名信息
+      console.log(userSig, 'userSig==============================');
+
+      console.log(globaltim, 'globaltim==================');
+      try {
+        // let options = {
+        //   SDKAppID: IM_APP_ID // 接入时需要将0替换为您的即时通信 IM 应用的 SDKAppID
+        // };
+        // let tim = TIM.create(options);
+        // // eslint-disable-next-line no-unused-vars
+
+        //定义状态变量，标识IM是否准备好
+        console.log('onSdkReady im ======================');
+        store.commit('updateIMStatus', true);
+
+        let response = globaltim.login({userID: userID, userSig: userSig});
+        console.log(response, '登录后的信息===================================');
+        // console.log('onSdkReady im ======================');
+        // store.commit('updateIMStatus', true);
+        //
+        // console.log(tim);
+        // let response = tim.login({userID: userID, userSig: userSig});
+        // console.log(response, '登录后的信息===================================');
+      } catch (e){
+        console.log(e, '登录错误');
+      }
+    },
     data(){
       return {
             slbHeight:'',
@@ -128,62 +163,7 @@ export default {
             message:'',
             userId: '',
             indexc: 1
-            // recordContent:[
-            //     {
-            //         'mineMsg': false,
-            //         'headUrl': "head002.png",
-            //         'nickName': "jack",
-            //         'contactText':"xiatounan",
-            //     },
-            //     {
-            //         'mineMsg': true,
-            //         'headUrl':"head001.png",
-            //         'nickName': "Tom",
-            //         'contactText':"xiatounan",
-            //     },
-            //     {
-            //         'mineMsg': false,
-            //         'headUrl': "head002.png",
-            //         'nickName': "jack",
-            //         'contactText':"xiatounan",
-            //     },
-            //     {
-            //         'mineMsg': false,
-            //         'headUrl': "head002.png",
-            //         'nickName': "jack",
-            //         'contactText':"xiatounan",
-            //     },
-            //     {
-            //         'mineMsg': true,
-            //         'headUrl': "head001.png",
-            //         'nickName': "Tom",
-            //         'contactText':"xiatounan",
-            //     },
-            //     {
-            //         'mineMsg': false,
-            //         'headUrl': "head002.png",
-            //         'nickName': "jack",
-            //         'contactText':"xiatounan",
-            //     },
-            //     {
-            //         'mineMsg': false,
-            //         'headUrl': "head002.png",
-            //         'nickName': "jack",
-            //         'contactText':"xiatounan",
-            //     },
-            //     {
-            //         'mineMsg': true,
-            //         'headUrl': "head001.png",
-            //         'nickName': "Tom",
-            //         'contactText':"xiatounan",
-            //     },
-            //     {
-            //         'mineMsg': false,
-            //         'headUrl': "head002.png",
-            //         'nickName': "jack",
-            //         'contactText':"xiatounan",
-            //     },
-            // ],
+
         }
     },
 
@@ -245,12 +225,14 @@ export default {
         //     }
         // },
         sendMsg(){
-            console.log(this.content, 'content=======================');
-            let options = {
-                SDKAppID: IM_APP_ID // 接入时需要将0替换为您的即时通信 IM 应用的 SDKAppID
-            };
-            let tim = TIM.create(options);
-            console.log(tim);
+            this.content = this.$refs.myLQuillEditor.quill.getText();
+            console.log(globaltim, 'globaltim===================');
+          // console.log(this.content, 'content=======================');
+            // let options = {
+            //     SDKAppID: IM_APP_ID // 接入时需要将0替换为您的即时通信 IM 应用的 SDKAppID
+            // };
+            // let tim = TIM.create(options);
+            // console.log(tim);
             // console.log(messageList, 'MessageList================');
             // console.log('onSdkReady im ======================');
             // store.commit('updateIMStatus', true);
@@ -265,7 +247,7 @@ export default {
             }
             //发送消息
           console.log(this.sendToName,'sendToName===============');
-          let message = tim.createTextMessage({
+          let message = globaltim.createTextMessage({
                 to: this.sendToName,
                 conversationType: TIM.TYPES.CONV_C2C,
                 // 消息优先级，用于群聊（v2.4.2起支持）。如果某个群的消息超过了频率限制，后台会优先下发高优先级的消息，详细请参考：https://cloud.tencent.com/document/product/269/3663#.E6.B6.88.E6.81.AF.E4.BC.98.E5.85.88.E7.BA.A7.E4.B8.8E.E9.A2.91.E7.8E.87.E6.8E.A7.E5.88.B6)
@@ -280,7 +262,7 @@ export default {
                 // cloudCustomData: 'your cloud custom data'
             });
 // 2. 发送消息
-            let promise = tim.sendMessage(message);
+            let promise = globaltim.sendMessage(message);
             promise.then((imResponse) => {
                 // 发送成功
                 console.log(imResponse, '发送成功');
