@@ -13,7 +13,7 @@ const routes = [
                     let user = sessionStorage.getItem('user');
                     let authority = JSON.parse(user).authority;
                     if (authority == 'SystemManager') return import('@/views/HomeAdmin.vue');
-                    if (authority == 'Consultant') return import('@/views/HomeCounselor.vue');
+                    if (authority == 'Counselor') return import('@/views/HomeCounselor.vue');
                     return import('@/views/HomeSupervisor.vue');
                 }, // to modify 
                 // component: () => import('@/views/HomeAdmin.vue'), 
@@ -89,6 +89,11 @@ const routes = [
     },
     {path: '/login', name: 'login', component: ()=>import('@/views/Login.vue')},
 ]
+
+// const user = {name:'a', authority:'SystemManager'};
+// const user = {name:'c', authority:'Counselor'};
+// const user = {name:'s', authority:'SuperVisor'};
+// sessionStorage.setItem("user", JSON.stringify(user))
 
 const router = createRouter({
     history: createWebHistory(),

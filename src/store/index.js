@@ -7,7 +7,6 @@ export default createStore({
         Authorization: localStorage.getItem('Authorization') ? localStorage.getItem('Authorization') : '',// 存储token
         imReady: false,   //存储IM准备状态
         messageList: [], //存储聊天记录 1.之前和别人的 2.别人给我的 3.我给别人的
-        tim: null,
     },
     mutations: {
         // 修改token，并将token存入localStorage
@@ -29,7 +28,7 @@ export default createStore({
 
         //别人给我发
         updateOtherSendToMeMsg(state, payload){
-            if(payload.payload.text != ''){
+            if(payload.payload.text != null){
                 state.messageList = [...state.messageList, payload];
             }
             console.log(state.messageList, 'message======================');

@@ -98,10 +98,18 @@ export default {
                     myTodayButton: {
                         text: '查看今天',
                         click: this.moveToToday
-                    }
+                    },
+                    myPrev: {
+                        icon: 'chevron-left',
+                        click: () => this.moveMonth(true),
+                    },
+                    myNext: {
+                        icon: 'chevron-right',
+                        click: () => this.moveMonth(false),
+                    },
                 },
                 headerToolbar: {
-                    right: 'prev,myTodayButton,next',
+                    right: 'myPrev,myTodayButton,myNext',
                     left: 'title',
                 },
                 eventDisplay: 'none',
@@ -112,7 +120,8 @@ export default {
             },
             scheduleType: "counselor",
             selectDate: new Date(),
-            scheduleData: [{ counselor: [{ w_name: 'a', w_username: 'a' }], supervisor: [] }],
+            selectDateData: {},
+            scheduleData: [],
             dialogVisible: false,
             newSchedule: '',
             availableSchedule: [],
@@ -126,6 +135,7 @@ export default {
                 this.onMonthChange(info.start.getFullYear(), info.start.getMonth());
             }
             this.selectDate = info.start;
+            this.generateDataCache();
         },
         onMonthChange(year, month) {
             this.loadMonthData(new Date(year, month));
@@ -134,7 +144,7 @@ export default {
             return Math.abs(info.start - info.end) <= 86400000;
         },
         onRemove(index) {
-            console.log(this.scheduleData[this.selectDate.getDate() - 1][this.scheduleType][index]);
+            console.log(this.selectDateData[this.scheduleType][index]);
 
             let stemp = this.scheduleType[0].toUpperCase() + this.scheduleType.slice(1);
             const url = 'arrange/delete' + stemp;
@@ -144,14 +154,15 @@ export default {
                 params: {
                     date: this.generateDateStr(),
                 },
-                data: this.scheduleData[this.selectDate.getDate() - 1][this.scheduleType][index],
+                data: this.selectDateData[this.scheduleType][index],
             }).then(res => {
                 if (res.code == '1') {
                     ElMessage({
                         type: 'success',
                         message: '取消排班成功',
                     });
-                    this.loadMonthData(this.selectDate);
+                    this.moveToDate(this.selectDate)
+                    // this.loadMonthData(this.selectDate);
                 } else {
                     ElMessage({
                         type: 'success',
@@ -204,15 +215,28 @@ export default {
             capi.select(new Date());
             capi.today();
         },
+        moveToDate(date) {
+            let capi = this.$refs.calendar.getApi();
+            capi.select(date);
+            capi.gotoDate(date);
+        },
+        moveMonth(isPrev) {
+            let capi = this.$refs.calendar.getApi();
+            let viewMonth = new Date();
+            if (isPrev) {
+                capi.prev();
+                viewMonth.setMonth(this.selectDate.getMonth() - 1);
+            } else {
+                capi.next();
+                viewMonth.setMonth(this.selectDate.getMonth() + 1);
+            }
+            this.loadMonthData(viewMonth);
+        },
         getCurrentList() {
-            if (this.selectDate == null) {
+            if (this.selectDateData == null) {
                 return null;
             }
-            let index = this.selectDate.getDate() - 1;
-            if (index < 0 || index >= this.scheduleData.length) {
-                return null;
-            }
-            return this.scheduleData[index][this.scheduleType];
+            return this.selectDateData[this.scheduleType];
         },
         getStaffCount(dateNum, scheduleType) {
             if (this.scheduleData[dateNum - 1]) {
@@ -232,15 +256,15 @@ export default {
                     this.scheduleData = res.data.arrangeData;
                 } else {
                     ElMessage({
-                        type: 'success',
-                        message: '登录成功',
+                        type: 'error',
+                        message: '抓取信息失败: '+res.message,
                     });
                 }
             }).catch(err => {
                 ElMessage({
                     type: 'error',
-                    message: err,
-                })
+                    message: '抓取信息错误: '+err,
+                });
             });
         },
         showAddWindow() {
@@ -263,16 +287,28 @@ export default {
                     this.availableSchedule = res.data['available' + stemp + 'Data'];
                 } else {
                     ElMessage({
-                        type: 'success',
-                        message: '查询成功',
+                        type: 'error',
+                        message: '查询列表失败: '+res.message,
                     });
                 }
             }).catch(err => {
                 ElMessage({
                     type: 'error',
-                    message: err,
+                    message: '查询列表出错: '+err,
                 })
             });
+        },
+        generateDataCache() {
+            if (this.selectDate == null) {
+                this.selectDateData = null;
+                return;
+            }
+            let index = this.selectDate.getDate() - 1;
+            if (index < 0 || index >= this.scheduleData.length) {
+                this.selectDateData = null;
+                return;
+            }
+            this.selectDateData = this.scheduleData[index];
         },
         generateDateStr() {
             return [this.selectDate.getFullYear(),

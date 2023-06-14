@@ -19,7 +19,6 @@ import TIM from 'tim-js-sdk';
 import TIMUploadPlugin from 'tim-upload-plugin';
 import TIMProfanityFilterPlugin from 'tim-profanity-filter-plugin';
 import store from "./store";
-// import {useRoute} from "vue-router";
 let options = {
     SDKAppID: IM_APP_ID // 接入时需要将0替换为您的即时通信 IM 应用的 SDKAppID
 };
@@ -65,6 +64,5 @@ const app = createApp(App);
 app.provide("globaltim", tim);
 app.use(ElementPlus).use(Quill).use(Store).use(Router).component('v-chart', VECharts).mount('#app')
 export const globaltim = tim;
-
 
 // createApp(App).use(ElementPlus).use(Store).use(Router).mount('#app')

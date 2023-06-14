@@ -70,7 +70,7 @@ import 'quill/dist/quill.bubble.css'
 
 import TIM from "tim-js-sdk";
 import {quillEditor} from "vue-quill-editor/src";
-import store from "@/store";
+// import store from "@/store";
 // import {useRoute} from "vue-router";
 
 const toolbarOptions = [
@@ -110,7 +110,6 @@ export default {
     components: {
         quillEditor
     },
-
     data(){
       return {
             slbHeight:'',
@@ -192,12 +191,12 @@ export default {
         clientHeight(){     //如果clientHeight 发生改变，这个函数就会运行
             this.changeFixed(this.clientHeight)
         },
-        imReady(value){
-            if(value){
-                this.getMessageList({userId:name});
-                console.log(this.getMessageList({userId: name}));
-            }
-        }
+        // imReady(value){
+        //     if(value){
+        //         this.getMessageList({userId:name});
+        //         console.log(this.getMessageList({userId: name}));
+        //     }
+        // }
     },
     computed:{
         ...mapState(['imReady', 'messageList'])
@@ -214,16 +213,16 @@ export default {
         changeFixed(clientHeight){
             this.slbHeight = clientHeight -375 + 'px';
         },
-        onEditorBlur (e) {
-            console.log('onEditorBlur: ', e)
+        onEditorBlur () {
+            console.log('onEditorBlur: ', this.content)
         },
         // 获得焦点事件
-        onEditorFocus (e) {
-            console.log('onEditorFocus: ', e)
+        onEditorFocus () {
+            console.log('onEditorFocus: ',this.content)
         },
         // 内容改变事件
-        onEditorChange (e) {
-            console.log('onEditorChange: ', e)
+        onEditorChange () {
+            console.log('onEditorChange: ', this.content)
         },
 
         ...mapActions(['getMessageList']),
@@ -251,9 +250,10 @@ export default {
                 SDKAppID: IM_APP_ID // 接入时需要将0替换为您的即时通信 IM 应用的 SDKAppID
             };
             let tim = TIM.create(options);
+            console.log(tim);
             // console.log(messageList, 'MessageList================');
-            console.log('onSdkReady im ======================');
-            store.commit('updateIMStatus', true);
+            // console.log('onSdkReady im ======================');
+            // store.commit('updateIMStatus', true);
 
             if(!this.imReady){
                 alert('IM系统还未准备好');
@@ -286,7 +286,7 @@ export default {
                 console.log(imResponse, '发送成功');
                 // 发送的消息更新代仓库，页面使用聊天记录自动更新
                 this.updateMySendMsg(message);
-                this.content = '';
+                // this.content = '';
             }).catch(function(imError) {
                 // 发送失败
                 console.warn('sendMessage error:', imError);

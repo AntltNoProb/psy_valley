@@ -55,7 +55,7 @@ export default {
     data(){
         return{
             currentVisitors: 4,
-            visitorNames:["wang", "wen", "hai", "lihua"],
+            visitorNames:["wang", "wen", "hai","lihua"],
             currentSupervisor:2,
             SupervisorNames:['wu','xu']
         }

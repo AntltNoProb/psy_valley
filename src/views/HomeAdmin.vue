@@ -1,7 +1,7 @@
 <template>
-    <div style="padding: 10px">
+    <div>
         <!--    功能区域-->
-        <el-main style="margin: 10px 0">
+        <el-main style="margin: 10px 10px">
             <el-row :gutter="10">
                 <el-col :span=8>
                     <consultCount shadow="hover" class="grid-content" :count="todayConsultCount" :time="todayConsultTime" />
