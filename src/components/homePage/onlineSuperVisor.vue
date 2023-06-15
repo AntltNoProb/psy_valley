@@ -4,7 +4,7 @@
             <el-col :span="18">
                 <el-text class="supervise-card-header">在线督导</el-text>
                 <div class="supervisor-list">
-                    <div v-if="superVisorArray.length <= 0" class="list-placeholder">
+                    <div v-if="superVisorArray.length <= 0" class="s-list-placeholder">
                         <el-text type="info">暂无在线督导</el-text>
                     </div>
                     <el-row>
@@ -25,6 +25,13 @@
                                 
                     </el-row>
                 </div>
+                <el-pagination background small 
+                    :style="{'justify-content':pagerAlign}"
+                    layout="prev, pager, next" 
+                    :page-size="pageSize"
+                    pager-count="6"
+                    v-model:current-page="curPage"
+                    :total="total"></el-pagination>
             </el-col>
             <el-col class="supervise-count" :span="6">
                 <el-statistic title="正在进行的咨询数" :value="curCount" />
@@ -33,28 +40,76 @@
     </el-card>
 </template>
 <script>
+import request from '@/utils/request';
+import { ElMessage } from 'element-plus';
 export default {
     props: {
-        superVisorArray: {
-            type: Array,
-            default() {
-                return [
-                    { name: 'sd', busy: true },
-                    { name: 's', busy: true },
-                    { name: '1', busy: false },
-                    { name: '2asdfasdfasdfasdf', busy: false },
-                    { name: '3', busy: true },
-                ];
-            }
-        },
-        curCount: {
-            type: Number,
-            default: 0,
+        pagerAlign: {
+            type: String,
+            default: 'flex-start',
         },
     },
     data() {
-
-    }
+        return {
+            superVisorArray: [],
+            total: 0,
+            curCount: 0,
+            curPage: 1,
+            pageSize: 6,
+        }
+    },
+    methods: {
+        loadSupervisor(page, size) {
+            const url = 'supervisors/onlineList';
+            request.get(url, {
+                params: {
+                    pageNum: page,
+                    pageSize: size,
+                },
+            }).then(res => {
+                if (res.code == '1') {
+                    this.superVisorArray = res.data.supervisors;
+                    this.total = res.data.total;
+                } else {
+                    ElMessage({
+                        type: 'error',
+                        message: '督导列表获取失败: ' + res.message,
+                    });
+                }
+            }).catch(err => {
+                ElMessage({
+                    type: 'error',
+                    message: '督导列表获取错误: ' + err,
+                });
+            });
+        },
+        loadCurrentCount() {
+            const url = 'records/currentCount';
+            request.get(url).then(res => {
+                if (res.code == '1') {
+                    this.curCount = res.data.total;
+                } else {
+                    ElMessage({
+                        type: 'error',
+                        message: '当前咨询数获取失败: ' + res.message,
+                    });
+                }
+            }).catch(err => {
+                ElMessage({
+                    type: 'error',
+                    message: '当前咨询数获取错误: ' + err,
+                });
+            });
+        },
+    },
+    watch: {
+        curPage(newPage) {
+            this.loadSupervisor(newPage, this.pageSize);
+        },
+    },
+    mounted() {
+        this.loadSupervisor(this.curPage, this.pageSize);
+    },
 }
 
 </script>
@@ -81,10 +136,12 @@ export default {
     justify-content: space-between;
 }
 
-.list-placeholder {
+.s-list-placeholder {
     align-items: center;
     text-align: center;
-    justify-content: space-between;
+    justify-content: space-around;
+    
+    padding-top: 10%;
 }
 
 .supervise-name {

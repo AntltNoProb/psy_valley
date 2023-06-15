@@ -4,12 +4,13 @@ const routes = [
     {
         path: '/',
         name: 'VueLayout',
-        component: ()=>import('@/layout/VueLayout.vue'),
-        redirect:"/home",
-        children:[
-             {path: 'home',
-                 name: 'home',
-                 component: () => {
+        component: () => import('@/layout/VueLayout.vue'),
+        redirect: "/home",
+        children: [
+            {
+                path: 'home',
+                name: 'home',
+                component: () => {
                     let user = sessionStorage.getItem('user');
                     let authority = JSON.parse(user).authority;
                     if (authority == 'SystemManager') return import('@/views/HomeAdmin.vue');
@@ -17,83 +18,88 @@ const routes = [
                     return import('@/views/HomeSupervisor.vue');
                 }, // to modify 
                 // component: () => import('@/views/HomeAdmin.vue'), 
-                 meta: {
-                     roles: ['SystemManager','Consultant','Supervisors']
-                 },
-             },
-            {path: 'chat',
+                meta: {
+                    roles: ['SystemManager', 'Consultant', 'Supervisors']
+                },
+            },
+            {
+                path: 'chat',
                 name: 'chat',
                 component: () => import('@/views/ChatPart.vue'), // to modify
                 meta: {
                     roles: ['Consultant']
                 },
             },
-            {path: 'assist',
+            {
+                path: '/assist',
                 name: 'assist',
-                component:()=>import ('@/views/AssistPart.vue'),
+                component: () => import('@/views/AssistPart.vue'),
                 meta: {
-                    roles: ['Consultant','Supervisors']
+                    roles: ['Consultant', 'Supervisors']
                 },
             },
-             {path: 'consult-record',
+            {
+                path: 'consult-record',
                 name: 'consult-record',
-                component: ()=>import('@/views/ConsultRecord.vue'),
+                component: () => import('@/views/ConsultRecord.vue'),
                 meta: {
-                             roles: ['SystemManager','Consultant','Supervisors']
+                    roles: ['SystemManager', 'Consultant', 'Supervisors']
                 },
             },
-            {path: 'dialog-record',
+            {
+                path: 'dialog-record',
                 name: 'dialog-record',
-                component: ()=>import('@/views/DialogRecord.vue'),
+                component: () => import('@/views/DialogRecord.vue'),
                 meta: {
-                            roles: ['admin','Supervisors']
+                    roles: ['admin', 'Supervisors']
                 },
             },
-            {path: 'supervisor-management',
+            {
+                path: 'supervisor-management',
                 name: 'supervisor-management',
-                component: ()=>import('@/views/SupervisorManagement.vue'),
+                component: () => import('@/views/SupervisorManagement.vue'),
                 meta: {
-                             roles: ['SystemManager']
+                    roles: ['SystemManager']
                 },
             },
-            {path: 'visitor-management',
+            {
+                path: 'visitor-management',
                 name: 'visitor-management',
-                component: ()=>import('@/views/VisitorManagement.vue'),
+                component: () => import('@/views/VisitorManagement.vue'),
                 meta: {
-                             roles: ['SystemManager','Supervisors']
+                    roles: ['SystemManager', 'Supervisors']
                 },
             },
-            {path: 'counselor-management',
+            {
+                path: 'counselor-management',
                 name: 'counselor-management',
-                component: ()=>import('@/views/CounselorManagement.vue'),
+                component: () => import('@/views/CounselorManagement.vue'),
                 meta: {
-                    roles: ['SystemManager','Supervisors']
+                    roles: ['SystemManager', 'Supervisors']
                 },
             },
 
-             {path: 'userspace',
-                 name: 'userspace',
-                 component: () => import('@/views/UserSpace.vue'),
-                 meta: {
-                     roles: ['SystemManager','Supervisors','Consultant']
-                 },
-             },
-            {path: 'working-schedule',
+            {
+                path: 'userspace',
+                name: 'userspace',
+                component: () => import('@/views/UserSpace.vue'),
+                meta: {
+                    roles: ['SystemManager', 'Supervisors', 'Consultant']
+                },
+            },
+            {
+                path: 'working-schedule',
                 name: 'working-schedule',
                 component: () => import('@/views/WorkingSchedule.vue'),
                 meta: {
-                     roles: ['SystemManager','Supervisors','Consultant']
+                    roles: ['SystemManager', 'Supervisors', 'Consultant']
                 },
             },
         ]
     },
-    {path: '/login', name: 'login', component: ()=>import('@/views/Login.vue')},
+    { path: '/login', name: 'login', component: () => import('@/views/Login.vue') },
 ]
 
-// const user = {name:'a', authority:'SystemManager'};
-// const user = {name:'c', authority:'Counselor'};
-// const user = {name:'s', authority:'SuperVisor'};
-// sessionStorage.setItem("user", JSON.stringify(user))
 
 const router = createRouter({
     history: createWebHistory(),
@@ -109,15 +115,23 @@ router.beforeEach((to, from, next) => {
             next('/login');
         } else {
             let user = sessionStorage.getItem('user')
-            if(!user){
+            if (!user) {
                 next('/login')
             }
             next()
-            if(to.meta.roles.includes(JSON.parse(user).authority)){
+            if (to.meta.roles.includes(JSON.parse(user).authority)) {
                 next()	//放行
             }
         }
     }
     next('/login')
+
+    
+    // const user = {name:'a', authority:'SystemManager'};
+    // const user = {name:'c', authority:'Counselor'};
+    // const user = {name:'s', authority:'SuperVisor'};
+    // sessionStorage.setItem("user", JSON.stringify(user));
+    // console.log(from, to);
+    // next();
 });
 export default router

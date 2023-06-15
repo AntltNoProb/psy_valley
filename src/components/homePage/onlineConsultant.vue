@@ -4,8 +4,8 @@
             <el-col :span="18">
                 <el-text class="consult-card-header">在线咨询师</el-text>
                 <div class="consultant-list">
-                    <div v-if="consultantArray.length <= 0" class="list-placeholder">
-                        <el-text type="info">暂无在线咨询师</el-text>
+                    <div v-if="consultantArray.length <= 0" class="c-list-placeholder">
+                        <el-text class="c-list-placeholder-text" type="info">暂无在线咨询师</el-text>
                     </div>
                     <el-row>
                         <el-tooltip  v-for="(consultant, index) in consultantArray" :key="index">
@@ -25,6 +25,13 @@
                                 
                     </el-row>
                 </div>
+                <el-pagination background small 
+                    :style="{'justify-content':pagerAlign}"
+                    layout="prev, pager, next" 
+                    :page-size="pageSize"
+                    pager-count="6"
+                    v-model:current-page="curPage"
+                    :total="total"></el-pagination>
             </el-col>
             <el-col class="consult-count" :span="6">
                 <el-statistic title="正在进行的咨询数" :value="curCount" />
@@ -33,30 +40,77 @@
     </el-card>
 </template>
 <script>
+import request from '@/utils/request';
+import { ElMessage } from 'element-plus';
 export default {
     props: {
-        consultantArray: {
-            type: Array,
-            default() {
-                return [
-                    { name: 'sd', busy: true },
-                    { name: 's', busy: true },
-                    { name: '1', busy: false },
-                    { name: '2asdfasdfasdfasdf', busy: false },
-                    { name: '3', busy: true },
-                ];
-            }
-        },
-        curCount: {
-            type: Number,
-            default: 0,
+        pagerAlign: {
+            type: String,
+            default: 'flex-start',
         },
     },
     data() {
-
+        return {
+            consultantArray: [],
+            total: 0,
+            curCount: 0,
+            curPage: 1,
+            pageSize: 12,
+        }
+    },
+    methods: {
+        loadConsultant(page, size) {
+            const url = 'counselors/onlineList';
+            request.get(url, {
+                params: {
+                    pageNum: page,
+                    pageSize: size,
+                },
+            }).then(res => {
+                if (res.code == '1') {
+                    this.consultantArray = res.data.counselors;
+                    this.total = res.data.total;
+                } else {
+                    ElMessage({
+                        type: 'error',
+                        message: '咨询师列表获取失败: ' + res.message,
+                    });
+                }
+            }).catch(err => {
+                ElMessage({
+                    type: 'error',
+                    message: '咨询师列表获取错误: ' + err,
+                });
+            });
+        },
+        loadCurrentCount() {
+            const url = 'records/currentCount';
+            request.get(url).then(res => {
+                if (res.code == '1') {
+                    this.curCount = res.data.total;
+                } else {
+                    ElMessage({
+                        type: 'error',
+                        message: '当前咨询数获取失败: ' + res.message,
+                    });
+                }
+            }).catch(err => {
+                ElMessage({
+                    type: 'error',
+                    message: '当前咨询数获取错误: ' + err,
+                });
+            });
+        },
+    },
+    watch: {
+        curPage(newPage) {
+            this.loadConsultant(newPage, this.pageSize);
+        },
+    },
+    mounted() {
+        this.loadConsultant(this.curPage, this.pageSize);
     }
 }
-
 </script>
 <style>
 .consultant-list {
@@ -80,10 +134,17 @@ export default {
     justify-content: space-between;
 }
 
-.list-placeholder {
+.c-list-placeholder {
     align-items: center;
     text-align: center;
-    justify-content: space-between;
+    justify-content: space-around;
+    height: 100%;
+    display: flex;
+    padding-top: 10%;
+}
+
+.c-list-placeholder-text {
+    height:100%;
 }
 
 .consult-name {

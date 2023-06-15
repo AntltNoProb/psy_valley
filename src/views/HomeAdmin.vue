@@ -4,7 +4,7 @@
         <el-main style="margin: 10px 10px">
             <el-row :gutter="10">
                 <el-col :span=8>
-                    <consultCount shadow="hover" class="grid-content" :count="todayConsultCount" :time="todayConsultTime" />
+                    <consultCount shadow="hover" class="grid-content"/>
                 </el-col>
                 <el-col :span=16>
                     <todayStatistic shadow="hover" class="grid-content" />
@@ -15,7 +15,7 @@
                     <onlineConsultant shadow="hover" class="grid-content" />
                 </el-col>
                 <el-col :span="12">
-                    <onlineSuperVisor shadow="hover" class="grid-content" />
+                    <onlineSuperVisor shadow="hover" class="grid-content" pager-align="flex-end" />
                 </el-col>
             </el-row>
             <el-row :gutter="10">
@@ -46,8 +46,6 @@ export default {
     },
     data() {
         return {
-            todayConsultCount: 0,
-            todayConsultTime: new Date(2023, 5, 2, 0, 0, 0),
         }
     }
 }
