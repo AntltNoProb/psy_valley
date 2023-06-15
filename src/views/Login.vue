@@ -1,32 +1,32 @@
 <template>
-    <div class="login" @keyup.enter="login">
-        <div style="width: 400px;margin: 150px auto">
-            <div style="font-size: 30px;text-align: center; padding: 30px 0">欢迎登录心声谷</div>
-            <el-form ref="form" :model="form" size="normal" :rules="rules">
-                <el-form-item prop="username">
-                    <el-input v-model="form.username" placeholder="用户名">
-                        <template #prefix>
-                            <el-icon class="el-input__icon"><avatar /></el-icon>
-                        </template>
-                    </el-input>
-                </el-form-item>
-                <el-form-item prop="password">
-                    <el-input v-model="form.password" placeholder="密码" show-password>
-                        <template #prefix>
-                            <el-icon class="el-input__icon"><lock /></el-icon>
-                        </template>
-                    </el-input>
-                </el-form-item>
-                <el-form-item>
-                    <el-button @click="onShow" type="success" style="width:400px;"> 开始验证 </el-button>
-                    <VerifyCode :show="isShow" @success="onSuccess" @close="onClose" />
-                </el-form-item>
-                <el-form-item>
-                    <el-button style="width: 100%;" type="primary" @click="login" :disabled="disabled">登录</el-button>
-                </el-form-item>
-            </el-form>
+        <div class="login" @keyup.enter="login" >
+            <div class="login-block">
+                <div style="font-size: 30px;text-align: center; padding: 30px 0">欢迎登录心声谷</div>
+                <el-form ref="form" :model="form" size="normal" :rules="rules" style="z-index: 0">
+                    <el-form-item prop="username">
+                        <el-input v-model="form.username" placeholder="用户名">
+                            <template #prefix>
+                                <el-icon class="el-input__icon"><avatar /></el-icon>
+                            </template>
+                        </el-input>
+                    </el-form-item>
+                    <el-form-item prop="password">
+                        <el-input v-model="form.password" placeholder="密码" show-password>
+                            <template #prefix>
+                                <el-icon class="el-input__icon"><lock /></el-icon>
+                            </template>
+                        </el-input>
+                    </el-form-item>
+                    <el-form-item>
+                        <el-button @click="onShow" type="success" style="width:400px;"> 开始验证 </el-button>
+                        <VerifyCode :show="isShow" @success="onSuccess" @close="onClose" />
+                    </el-form-item>
+                    <el-form-item>
+                        <el-button style="width: 100%;" type="primary" @click="login" :disabled="disabled">登录</el-button>
+                    </el-form-item>
+                </el-form>
+            </div>
         </div>
-    </div>
 </template>
 <script>
 import {
@@ -41,7 +41,7 @@ import {ElMessage} from "element-plus";
 // import {genTestUserSig} from "@/IMdebug";
 // import {IM_APP_ID} from "@/IMconfig/im";
 // import TIM from "tim-js-sdk";
-// import store from "@/store";
+//import store from "@/store";
 // import {globaltim} from "@/main";
 export default {
     // eslint-disable-next-line vue/multi-word-component-names
@@ -182,7 +182,13 @@ export default {
     position: relative;
     overflow: hidden
 }
-
+.login-block{
+    width: 400px;
+    background-color:#FFFFFF80;
+    padding:50px;
+    z-index:-1;
+    margin: 150px auto
+}
 .login-box {
   border: 1px solid #DCDFE6;
   width: 350px;

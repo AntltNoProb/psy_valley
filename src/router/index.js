@@ -28,7 +28,7 @@ const routes = [
                     roles: ['Consultant']
                 },
             },
-            {path: '/assist',
+            {path: 'assist',
                 name: 'assist',
                 component:()=>import ('@/views/AssistPart.vue'),
                 meta: {

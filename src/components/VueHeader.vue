@@ -2,7 +2,7 @@
     <el-container class="home-container">
         <el-header><!-- 头部区 -->
             <div>
-                <el-avatar src="logo.png" shape="circle"></el-avatar>
+                <el-avatar :src="circle_URL" :shape="circle" size="default"></el-avatar>
                 <span>心声谷</span>
             </div>
             <el-dropdown >
@@ -23,7 +23,7 @@
 
 <script>
 import {ArrowDown} from "@element-plus/icons";
-
+import circleURL from '@/assets/logo.png'
 
 export default {
     name: "VueHeader",
@@ -31,10 +31,12 @@ export default {
     data(){
         return{
             user:{},
+            circle_URL: circleURL,
         }
     },
     components:{
         ArrowDown,
+
     },
     created() {
         let userinfo = sessionStorage.getItem("user")
