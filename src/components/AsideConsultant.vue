@@ -35,7 +35,7 @@
                 </el-menu-item>
             </el-menu-item-group>
             <el-menu-item-group title="求助">
-                <el-menu-item v-for="(o, inx) in currentSupervisor" :key="o" @click="$router.push('/assist')">
+                <el-menu-item v-for="(o, inx) in currentSupervisor" :key="o" @click="$router.push({path: 'assist', query:{'pno': supervisorPnos[cnt], 'name': supervisorName[cnt]}})">
                     <span>{{supervisorName[inx]}}</span>
                 </el-menu-item>
             </el-menu-item-group>
@@ -67,6 +67,7 @@ export default {
         let visitorNames=ref([]);
         let visitorPnos=ref([]);
         let supervisorName=ref([]);
+        let supervisorPno=ref([]);
       // eslint-disable-next-line no-unused-vars
         let conversationList = ref([]);
         let currentVisitors = ref(0);
@@ -124,11 +125,14 @@ export default {
                 }).then(res => {
                   let tmp;
                   supervisorName.value=[];
+                  supervisorPno.value=[];
                   currentSupervisor.value=res.data.total;
                   for (tmp of res.data.consultants){
+                    supervisorPno.value=[...supervisorPno.value, tmp.bind_username];
                     supervisorName.value=[...supervisorName.value, tmp.bind_name];
                   }
                   console.log(supervisorName,'supervisorName');
+                  console.log(supervisorPno,'supervisorPnos');
                   // supervisorName.value=[...supervisorName.value,res.data.boundSupervisorName];
                   // console.log(supervisorName.value, "supervisorName.value");
                   // currentSupervisor.value = 1;
@@ -161,6 +165,7 @@ export default {
             visitorNames,
             visitorPnos,
             supervisorName,
+            supervisorPno,
             currentVisitors,
             currentSupervisor
         }
