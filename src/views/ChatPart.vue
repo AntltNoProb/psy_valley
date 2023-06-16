@@ -98,11 +98,14 @@ export default {
     },
     setup(){
       const route = useRoute();
-      let senderName = route.query.name;
+      let senderPno = ref(route.query.pno);
+      let senderName = ref(route.query.name);
+      console.log(senderName.value,'senderName');
+      console.log(senderPno.value,'senderPno');
       let imReady=ref(false);
       let messageList = ref([]);
-      if(sessionStorage.getItem('message')!=null){
-        let tmp = JSON.parse(sessionStorage.getItem('message'));
+      if(sessionStorage.getItem(senderPno.value)!=null){
+        let tmp = JSON.parse(sessionStorage.getItem(senderPno.value));
         messageList.value=tmp;
       }else {
         messageList.value=[];
@@ -115,7 +118,7 @@ export default {
         if(payload.payload.text != null){
           messageList.value = [...messageList.value, payload];
           let messageListJson = JSON.stringify(this.messageList);
-          sessionStorage.setItem('message', messageListJson);
+          sessionStorage.setItem(senderPno.value, messageListJson);
         }
         console.log(messageList.value, 'message======================');
       }
@@ -133,6 +136,7 @@ export default {
       globaltim.on(TIM.EVENT.MESSAGE_RECEIVED, onMessageReceived);
 
       return{
+        senderPno,
         senderName,
         imReady,
         messageList,
@@ -214,8 +218,8 @@ export default {
         updateMySendMsg(payload){
           this.messageList = [...this.messageList, payload];
           let messageListJson = JSON.stringify(this.messageList);
-          sessionStorage.setItem('message', messageListJson);
-          console.log(sessionStorage.getItem('message'), 'sessionStorage=================');
+          sessionStorage.setItem(this.senderPno, messageListJson);
+          // console.log(sessionStorage.getItem('message'), 'sessionStorage=================');
         },
 
         sendMsg(){
@@ -234,9 +238,8 @@ export default {
                 return
             }
             //发送消息
-            console.log(this.senderName,'sendToName===============');
             let message = globaltim.createTextMessage({
-                to: this.senderName,
+                to: this.senderPno,
                 conversationType: TIM.TYPES.CONV_C2C,
                 // 消息优先级，用于群聊（v2.4.2起支持）。如果某个群的消息超过了频率限制，后台会优先下发高优先级的消息，详细请参考：https://cloud.tencent.com/document/product/269/3663#.E6.B6.88.E6.81.AF.E4.BC.98.E5.85.88.E7.BA.A7.E4.B8.8E.E9.A2.91.E7.8E.87.E6.8E.A7.E5.88.B6)
                 // 支持的枚举值：TIM.TYPES.MSG_PRIORITY_HIGH, TIM.TYPES.MSG_PRIORITY_NORMAL（默认）, TIM.TYPES.MSG_PRIORITY_LOW, TIM.TYPES.MSG_PRIORITY_LOWEST

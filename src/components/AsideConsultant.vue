@@ -30,13 +30,13 @@
                 <span>会话管理</span>
             </template>
             <el-menu-item-group title="咨询">
-                <el-menu-item v-for="(o, cnt) in currentVisitors" :key="o" @click="$router.push({path: 'chat', query:{name: visitorNames[cnt]}})">
+                <el-menu-item v-for="(o, cnt) in currentVisitors" :key="o" @click="$router.push({path: 'chat', query:{'pno': visitorPnos[cnt], 'name': visitorNames[cnt]}})">
                     <span>{{visitorNames[cnt]}}</span>
                 </el-menu-item>
             </el-menu-item-group>
             <el-menu-item-group title="求助">
                 <el-menu-item v-for="(o, inx) in currentSupervisor" :key="o" @click="$router.push('/assist')">
-                    <span>{{SupervisorNames[inx]}}</span>
+                    <span>{{supervisorName[inx]}}</span>
                 </el-menu-item>
             </el-menu-item-group>
         </el-sub-menu>
@@ -50,16 +50,24 @@ import {
     ArrowDown ,
 
 } from '@element-plus/icons'
-import {ref} from "vue";
+import {onBeforeUnmount, ref} from "vue";
 import {globaltim} from "@/main";
 import {genTestUserSig} from "@/IMdebug";
+import TIM from "tim-js-sdk";
+// eslint-disable-next-line no-unused-vars
+import request from "@/utils/request";
+// eslint-disable-next-line no-unused-vars
+import {ElMessage} from "element-plus";
+
 
 export default {
     inject:['reload'],
     name:"AsideConsultant",
     setup(){
         let visitorNames=ref([]);
-        let SupervisorNames=ref([]);
+        let visitorPnos=ref([]);
+        let supervisorName=ref([]);
+      // eslint-disable-next-line no-unused-vars
         let conversationList = ref([]);
         let currentVisitors = ref(0);
         let currentSupervisor = ref(0);
@@ -69,36 +77,90 @@ export default {
         let userID = JSON.parse(userinfo).username;
         console.log(userID);
         let userSig = genTestUserSig(userID).userSig; //签名信息
-        console.log(userSig, 'userSig==============================');
-        try {
-            console.log('onSdkReady im ======================');
-            let response = globaltim.login({userID: userID, userSig: userSig});
-            console.log(response, '登录后的信息===================================');
-        } catch (e){
-            console.log(e, '登录错误');
-        }
-        // eslint-disable-next-line no-unused-vars
+
+        let promise1 = globaltim.login({userID: userID, userSig: userSig});
+        promise1.then(function(imResponse) {
+          console.log(imResponse.data, "登录成功============="); // 登录成功
+          if (imResponse.data.repeatLogin === true) {
+            // 标识帐号已登录，本次登录操作为重复登录。v2.5.1 起支持
+            console.log(imResponse.data.errorInfo);
+          }
+
+          // eslint-disable-next-line no-unused-vars
+          let onSdkReady = function(event) {
+            // 修改个人标配资料
+            let promise2 = globaltim.updateMyProfile({
+              nick: JSON.parse(sessionStorage.getItem("user")).name,
+              // avatar: 'http(s)://url/to/image.jpg',
+              // gender: TIM.TYPES.GENDER_MALE,
+              // selfSignature: '我的个性签名',
+              // allowType: TIM.TYPES.ALLOW_TYPE_ALLOW_ANY
+            });
+            promise2.then(function(imResponse) {
+              console.log(imResponse.data); // 更新资料成功
+              console.log(JSON.parse(sessionStorage.getItem("user")).name, 'updateProfile');
+
+            }).catch(function(imError) {
+              console.warn('updateMyProfile error:', imError); // 更新资料失败的相关信息
+            });
+          };
+          globaltim.on(TIM.EVENT.SDK_READY, onSdkReady);
+        }).catch(function(imError) {
+          console.warn('login error:', imError); // 登录失败的相关信息
+        });
+
+
+
+
         let intervalId = setInterval(function (){
             let promise = globaltim.getConversationList();
             promise.then(function(imResponse) {
+                supervisorName.value=[];
+                //获取绑定督导的username和name
+                request.get("/counselors/boundSupervisor",{
+                  params:{
+                    username: userID
+                  },
+                }).then(res => {
+                  let tmp;
+                  supervisorName.value=[];
+                  currentSupervisor.value=res.data.total;
+                  for (tmp of res.data.consultants){
+                    supervisorName.value=[...supervisorName.value, tmp.bind_name];
+                  }
+                  console.log(supervisorName,'supervisorName');
+                  // supervisorName.value=[...supervisorName.value,res.data.boundSupervisorName];
+                  // console.log(supervisorName.value, "supervisorName.value");
+                  // currentSupervisor.value = 1;
+                })
+
                 conversationList.value = imResponse.data.conversationList; // 全量的会话列表，用该列表覆盖原有的会话列表
-                console.log(conversationList.value);
+                // console.log(conversationList.value, 'conversation======');
                 let item;
                 visitorNames.value=[];
                 currentVisitors.value=conversationList.value.length;
+                visitorPnos.value=[];
                 for (item of conversationList.value){
-                    // console.log(item, 'item===========');
-                    visitorNames.value=[...visitorNames.value, item.userProfile.userID];
+                  console.log(item.userProfile.userID, 'item');
+                  visitorPnos.value=[...visitorPnos.value, item.userProfile.userID];
+                  visitorNames.value=[...visitorNames.value, item.userProfile.nick];
                 }
+                console.log(visitorNames,'visitorNames');
+                console.log(visitorPnos, 'visitorPnos');
             }).catch(function(imError) {
                 console.warn('getConversationList error:', imError); // 获取会话列表失败的相关信息
             });
         }, 1000);
 
+        onBeforeUnmount(() => {
+          clearInterval(intervalId)
+          intervalId = null;
+        })
 
         return{
             visitorNames,
-            SupervisorNames,
+            visitorPnos,
+            supervisorName,
             currentVisitors,
             currentSupervisor
         }

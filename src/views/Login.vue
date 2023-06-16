@@ -64,7 +64,6 @@ export default {
                     {pattern:/^.{6,}$/,required: true, message: '密码格式错误', trigger: 'blur'}
                 ]
             }
-
         }
     },
     mounted() {
