@@ -108,7 +108,6 @@ export default {
             openeds: ['1'],
             uniqueOpened: false
         }
-
     },
     mounted() {
         document.title='心声谷'
@@ -118,8 +117,5 @@ export default {
         ArrowDown ,
         IconMenu,
     },
-    methods: {
-
-    }
 }
 </script>

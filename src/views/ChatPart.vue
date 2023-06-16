@@ -12,11 +12,11 @@
                                 <el-avatar shape="square" :size="50" src="itemc.headUrl"/>
                             </el-col>
                             <el-col span="8" >{{itemc.from}}</el-col>
-                            <div class="tip-left">{{itemc.payload.text}}</div>
+                            <div class="tip-left">{{messageContent(itemc)}}</div>
                         </el-row>
                         <el-row gutter="10" v-else type="flex" justify="end">
                             <el-col span="12">
-                                <div class="tip-right">{{itemc.payload.text}}</div>
+                                <div class="tip-right">{{messageContent(itemc)}}</div>
                             </el-col>
                             <el-col span="8">{{itemc.from}}</el-col>
                             <el-col span="4"><el-avatar shape="square" :size="50" src="itemc.headUrl" /></el-col>
@@ -100,13 +100,22 @@ export default {
       const route = useRoute();
       let senderName = route.query.name;
       let imReady=ref(false);
-      let messageList=ref([]);
-      let updateIMStatus=(payload)=>{
-        imReady.value=payload;
+      let messageList = ref([]);
+      if(sessionStorage.getItem('message')!=null){
+        let tmp = JSON.parse(sessionStorage.getItem('message'));
+        messageList.value=tmp;
+      }else {
+        messageList.value=[];
       }
+      // let messageList=ref(localStorage.getItem('message'));
+      // let updateIMStatus=(payload)=>{
+      //   imReady.value=payload;
+      // }
       let updateOtherSendToMeMsg=(payload)=>{
         if(payload.payload.text != null){
           messageList.value = [...messageList.value, payload];
+          let messageListJson = JSON.stringify(this.messageList);
+          sessionStorage.setItem('message', messageListJson);
         }
         console.log(messageList.value, 'message======================');
       }
@@ -127,7 +136,6 @@ export default {
         senderName,
         imReady,
         messageList,
-        updateIMStatus,
         updateOtherSendToMeMsg
       }
     },
@@ -155,6 +163,9 @@ export default {
         },
     },
     computed:{
+      TIM() {
+        return TIM
+      }
         // ...mapState(['imReady', 'messageList'])
     },
     mounted() {
@@ -187,12 +198,31 @@ export default {
             console.log('onEditorChange: ', this.content)
         },
 
+        messageKind(payload){
+          return payload.type
+        },
+
+        messageContent(payload){
+          if(payload.type === TIM.TYPES.MSG_TEXT){
+            return payload.payload.text
+          }else if(payload.type === TIM.TYPES.MSG_IMAGE){
+            console.log(payload.payload.imageInfoArray, 'picture===================');
+            return payload.payload.imageInfoArray[2].url;
+          }
+        },
+
         updateMySendMsg(payload){
           this.messageList = [...this.messageList, payload];
+          let messageListJson = JSON.stringify(this.messageList);
+          sessionStorage.setItem('message', messageListJson);
+          console.log(sessionStorage.getItem('message'), 'sessionStorage=================');
         },
 
         sendMsg(){
             this.content = this.$refs.myLQuillEditor.quill.getText();
+            console.log(this.content);
+            let img = this.$refs.myLQuillEditor.quill.get;
+            console.log(img);
             console.log(globaltim, 'globaltim===================');
             console.log(this.imReady);
             // if(!this.imReady){
@@ -235,8 +265,7 @@ export default {
                 // 发送失败
                 console.warn('sendMessage error:', imError);
             });
-
-            console.log(this.senderName)
+          // console.log(this.senderName)
         }
     }
 }
@@ -251,6 +280,7 @@ export default {
         margin: 0;
         padding: 0;
     }
+    /*左三角*/
     .tip-left {
         margin: 20px;
         padding: 5px;
@@ -264,6 +294,7 @@ export default {
         -moz-border-radius: 5px;
         border-radius: 5px;
     }
+
     .tip-left:before, .tip-left:after {
         content: "";
         display: block;
@@ -276,10 +307,12 @@ export default {
         font-size: 0;
         line-height: 0;
     }
+
     .tip-left:after {
         left: -27px;
         border-color: transparent #FFF transparent transparent;
     }
+
     /*右三角*/
     .tip-right {
         margin: 20px;
