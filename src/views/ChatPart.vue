@@ -18,7 +18,7 @@
                             <el-col span="12">
                                 <div class="tip-right">{{messageContent(itemc)}}</div>
                             </el-col>
-                            <el-col span="8">{{itemc.from}}</el-col>
+                            <el-col span="8">{{myname}}</el-col>
                             <el-col span="4"><el-avatar shape="square" :size="50" src="itemc.headUrl" /></el-col>
                         </el-row>
                     </div>
@@ -158,6 +158,7 @@ export default {
             message:'',
             userId: '',
             indexc: 1,
+            myname: JSON.parse(sessionStorage.getItem("user")).name
         }
     },
 

@@ -15,11 +15,11 @@ const routes = [
                     let authority = JSON.parse(user).authority;
                     if (authority == 'SystemManager') return import('@/views/HomeAdmin.vue');
                     if (authority == 'Counselor') return import('@/views/HomeCounselor.vue');
-                    return import('@/views/HomeSupervisor.vue');
+                    if (authority == 'Supervisor')return import('@/views/HomeSupervisor.vue');
                 }, // to modify 
                 // component: () => import('@/views/HomeAdmin.vue'), 
                 meta: {
-                    roles: ['SystemManager', 'Consultant', 'Supervisors']
+                    roles: ['SystemManager', 'Consultant', 'Supervisor']
                 },
             },
             {
@@ -31,11 +31,19 @@ const routes = [
                 },
             },
             {
-                path: '/assist',
+                path: 'solve',
+                name: 'solve',
+                component: () => import('@/views/SolvePart.vue'), // to modify
+                meta: {
+                    roles: ['Supervisors']
+                },
+            },
+            {
+                path: 'assist',
                 name: 'assist',
                 component: () => import('@/views/AssistPart.vue'),
                 meta: {
-                    roles: ['Consultant', 'Supervisors']
+                    roles: ['Consultant', 'Supervisor']
                 },
             },
             {
@@ -43,7 +51,7 @@ const routes = [
                 name: 'consult-record',
                 component: () => import('@/views/ConsultRecord.vue'),
                 meta: {
-                    roles: ['SystemManager', 'Consultant', 'Supervisors']
+                    roles: ['SystemManager', 'Consultant', 'Supervisor']
                 },
             },
             {
@@ -67,7 +75,7 @@ const routes = [
                 name: 'visitor-management',
                 component: () => import('@/views/VisitorManagement.vue'),
                 meta: {
-                    roles: ['SystemManager', 'Supervisors']
+                    roles: ['SystemManager', 'Supervisor']
                 },
             },
             {
@@ -75,7 +83,7 @@ const routes = [
                 name: 'counselor-management',
                 component: () => import('@/views/CounselorManagement.vue'),
                 meta: {
-                    roles: ['SystemManager', 'Supervisors']
+                    roles: ['SystemManager', 'Supervisor']
                 },
             },
 
@@ -84,7 +92,7 @@ const routes = [
                 name: 'userspace',
                 component: () => import('@/views/UserSpace.vue'),
                 meta: {
-                    roles: ['SystemManager', 'Supervisors', 'Consultant']
+                    roles: ['SystemManager', 'Supervisor', 'Consultant']
                 },
             },
             {
@@ -92,12 +100,12 @@ const routes = [
                 name: 'working-schedule',
                 component: () => import('@/views/WorkingSchedule.vue'),
                 meta: {
-                    roles: ['SystemManager', 'Supervisors', 'Consultant']
+                    roles: ['SystemManager', 'Supervisor', 'Consultant']
                 },
             },
         ]
     },
-    { path: '/login', name: 'login', component: () => import('@/views/Login.vue') },
+    {path: '/login', name: 'login', component: () => import('@/views/Login.vue') },
 ]
 
 
@@ -125,13 +133,5 @@ router.beforeEach((to, from, next) => {
         }
     }
     next('/login')
-
-    
-    // const user = {name:'a', authority:'SystemManager'};
-    // const user = {name:'c', authority:'Counselor'};
-    // const user = {name:'s', authority:'SuperVisor'};
-    // sessionStorage.setItem("user", JSON.stringify(user));
-    // console.log(from, to);
-    // next();
 });
 export default router

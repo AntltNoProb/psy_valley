@@ -35,8 +35,8 @@
                 </el-menu-item>
             </el-menu-item-group>
             <el-menu-item-group title="求助">
-                <el-menu-item v-for="(o, inx) in currentSupervisor" :key="o" @click="$router.push({path: 'assist', query:{'pno': supervisorPnos[cnt], 'name': supervisorName[cnt]}})">
-                    <span>{{supervisorName[inx]}}</span>
+                <el-menu-item  v-for="(o, inx) in currentSupervisor" :key="o" @click="$router.push({path: 'assist', query:{'username': supervisorUsername[inx], 'name': supervisorName[inx]}})">
+                    <span >{{supervisorName[inx]}}</span>
                 </el-menu-item>
             </el-menu-item-group>
         </el-sub-menu>
@@ -57,7 +57,7 @@ import TIM from "tim-js-sdk";
 // eslint-disable-next-line no-unused-vars
 import request from "@/utils/request";
 // eslint-disable-next-line no-unused-vars
-import {ElMessage} from "element-plus";
+//import {ElMessage} from "element-plus";
 
 
 export default {
@@ -67,7 +67,7 @@ export default {
         let visitorNames=ref([]);
         let visitorPnos=ref([]);
         let supervisorName=ref([]);
-        let supervisorPno=ref([]);
+        let supervisorUsername=ref([]);
       // eslint-disable-next-line no-unused-vars
         let conversationList = ref([]);
         let currentVisitors = ref(0);
@@ -86,7 +86,6 @@ export default {
             // 标识帐号已登录，本次登录操作为重复登录。v2.5.1 起支持
             console.log(imResponse.data.errorInfo);
           }
-
           // eslint-disable-next-line no-unused-vars
           let onSdkReady = function(event) {
             // 修改个人标配资料
@@ -110,13 +109,10 @@ export default {
           console.warn('login error:', imError); // 登录失败的相关信息
         });
 
-
-
-
         let intervalId = setInterval(function (){
             let promise = globaltim.getConversationList();
             promise.then(function(imResponse) {
-                supervisorName.value=[];
+
                 //获取绑定督导的username和name
                 request.get("/counselors/boundSupervisor",{
                   params:{
@@ -125,17 +121,14 @@ export default {
                 }).then(res => {
                   let tmp;
                   supervisorName.value=[];
-                  supervisorPno.value=[];
+                  supervisorUsername.value=[];
                   currentSupervisor.value=res.data.total;
                   for (tmp of res.data.consultants){
-                    supervisorPno.value=[...supervisorPno.value, tmp.bind_username];
+                    supervisorUsername.value=[...supervisorUsername.value, tmp.bind_username];
                     supervisorName.value=[...supervisorName.value, tmp.bind_name];
                   }
                   console.log(supervisorName,'supervisorName');
-                  console.log(supervisorPno,'supervisorPnos');
-                  // supervisorName.value=[...supervisorName.value,res.data.boundSupervisorName];
-                  // console.log(supervisorName.value, "supervisorName.value");
-                  // currentSupervisor.value = 1;
+                  console.log(supervisorUsername,'supervisorPnos');
                 })
 
                 conversationList.value = imResponse.data.conversationList; // 全量的会话列表，用该列表覆盖原有的会话列表
@@ -165,7 +158,7 @@ export default {
             visitorNames,
             visitorPnos,
             supervisorName,
-            supervisorPno,
+            supervisorUsername,
             currentVisitors,
             currentSupervisor
         }

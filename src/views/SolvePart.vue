@@ -1,7 +1,7 @@
 <template>
     <div style="padding: 10px" >
         <el-row type="flex" justify="center" :style="{backgroundColor: 'pink'}">
-            <p>{{supervisorName}}</p>
+            <p>{{counselorName}}</p>
         </el-row>
         <div style="width:100%" :style="{height: slbHeight}">
             <el-scrollbar ref="scrollbarRef">
@@ -28,19 +28,18 @@
         <div>
             <div class="local-quill-editor">
                 <quill-editor
-                    ref="myLQuillEditor"
-                    v-model="content"
-                    :options="editorOption"
-                    class="editor"
-                    @blur="onEditorBlur"
-                    @focus="onEditorFocus"
-                    @change="onEditorChange">
+                        ref="myLQuillEditor"
+                        v-model="content"
+                        :options="editorOption"
+                        class="editor"
+                        @blur="onEditorBlur"
+                        @focus="onEditorFocus"
+                        @change="onEditorChange">
                     >
                 </quill-editor>
             </div>
         </div>
         <el-row type="flex" justify="end">
-            <el-button type="danger" size="large" @click="endAssist">结束求助</el-button>
             <el-button type="success" size="large" @click="sendMsg">发送</el-button>
         </el-row>
     </div>
@@ -93,31 +92,45 @@ const toolbarOptions = [
 
 export default {
     // eslint-disable-next-line vue/multi-word-component-names
-    name:"assistPart",
+    name:"solvePart",
     components: {
         quillEditor
     },
     setup(){
-        const startTime = new Date();
         const route = useRoute();
-        let supervisorName = route.query.name;
-        let supervisorUsername = route.query.username;
+        let counselorUsername = ref(route.query.username);
+        let counselorName = ref(route.query.name);
+
         let imReady=ref(false);
         let messageList = ref([]);
-        if(sessionStorage.getItem('message')!=null){
-            let tmp = JSON.parse(sessionStorage.getItem('message'));
+        if(sessionStorage.getItem(counselorUsername.value+"his")!=null){
+            let tmp = JSON.parse(sessionStorage.getItem(counselorUsername.value+"his"));
             messageList.value=tmp;
         }else {
             messageList.value=[];
         }
+
+        if(sessionStorage.getItem(counselorUsername.value)!=null) {
+            let tmp = JSON.parse(sessionStorage.getItem(counselorUsername.value));
+            messageList.value = [...messageList.value, tmp];
+        }
+        // }else {
+        //     messageList.value=[];
+        // }
+
+        // let messageList=ref(localStorage.getItem('message'));
+        // let updateIMStatus=(payload)=>{
+        //   imReady.value=payload;
+        // }
         let updateOtherSendToMeMsg=(payload)=>{
             if(payload.payload.text != null){
                 messageList.value = [...messageList.value, payload];
                 let messageListJson = JSON.stringify(this.messageList);
-                sessionStorage.setItem('message', messageListJson);
+                sessionStorage.setItem(counselorUsername.value, messageListJson);
             }
             console.log(messageList.value, 'message======================');
         }
+
         // TIM监听接收消息
         let onMessageReceived = function(event) {
             // event.data - 存储 Message 对象的数组 - [Message]
@@ -127,26 +140,21 @@ export default {
                 updateOtherSendToMeMsg(event.data[0])
             }
         };
-
         //监听发送来的消息
         globaltim.on(TIM.EVENT.MESSAGE_RECEIVED, onMessageReceived);
 
         return{
-            startTime,
-            supervisorName,
-            supervisorUsername,
+            counselorName,
+            counselorUsername,
             imReady,
             messageList,
             updateOtherSendToMeMsg
         }
     },
-
     data(){
         return {
             slbHeight:'',
             clientHeight:'',
-            endTime:'',
-            timeDiff:'', // 时间差（格式：hh:mm:ss）
             content: '',//聊天的内容
             editorOption: {
                 modules: {
@@ -185,27 +193,6 @@ export default {
         this.scrollToBottom();
     },
     methods :{
-        calculateTimeDiff() {
-            const diff = Math.abs(this.endDate - this.startDate) / 1000; // 获取时间差（单位：秒）
-            const hours = Math.floor(diff / 3600);  // 计算小时数
-            const minutes = Math.floor((diff % 3600) / 60); // 计算分钟数
-            const seconds = Math.floor(diff % 60); // 计算秒数
-            // 格式化时间差为 hh:mm:ss
-            this.timeDiff = `${this.padZero(hours)}:${this.padZero(minutes)}:${this.padZero(seconds)}`;
-        },
-        padZero(num) {
-            return String(num).padStart(2, '0'); // 补零，确保两位数格式
-        },
-        endAssist(){
-            this.endTime = new Date();
-            this.calculateTimeDiff();
-            console.log(this.timeDiff);
-
-            //保存求助记录
-
-            this.$router.back();
-            this.$destroy();
-        },
         scrollToBottom(){
             this.$refs.scrollbarRef.setScrollTop(this.$refs.innerRef.clientHeight);
         },
@@ -240,29 +227,23 @@ export default {
         updateMySendMsg(payload){
             this.messageList = [...this.messageList, payload];
             let messageListJson = JSON.stringify(this.messageList);
-            sessionStorage.setItem('message', messageListJson);
-            console.log(sessionStorage.getItem('message'), 'sessionStorage=================');
+            sessionStorage.setItem(this.counselorUsername, messageListJson);
+            // console.log(sessionStorage.getItem('message'), 'sessionStorage=================');
         },
-
         sendMsg(){
             this.content = this.$refs.myLQuillEditor.quill.getText();
             console.log(this.content);
-            //let img = this.$refs.myLQuillEditor.quill.get;
-           // console.log(img);
+            // let img = this.$refs.myLQuillEditor.quill.get;
+            // console.log(img);
             console.log(globaltim, 'globaltim===================');
             console.log(this.imReady);
-            // if(!this.imReady){
-            //     alert('IM系统还未准备好');
-            //     return
-            // }
             if(this.content.trim() === ''){
                 alert('请输入聊天信息');
                 return
             }
             //发送消息
-            console.log(this.supervisorName,'sendToName===============');
             let message = globaltim.createTextMessage({
-                to: this.supervisorUsername,
+                to: this.counselorUsername,
                 conversationType: TIM.TYPES.CONV_C2C,
                 // 消息优先级，用于群聊（v2.4.2起支持）。如果某个群的消息超过了频率限制，后台会优先下发高优先级的消息，详细请参考：https://cloud.tencent.com/document/product/269/3663#.E6.B6.88.E6.81.AF.E4.BC.98.E5.85.88.E7.BA.A7.E4.B8.8E.E9.A2.91.E7.8E.87.E6.8E.A7.E5.88.B6)
                 // 支持的枚举值：TIM.TYPES.MSG_PRIORITY_HIGH, TIM.TYPES.MSG_PRIORITY_NORMAL（默认）, TIM.TYPES.MSG_PRIORITY_LOW, TIM.TYPES.MSG_PRIORITY_LOWEST
@@ -291,13 +272,14 @@ export default {
                 // 发送失败
                 console.warn('sendMessage error:', imError);
             });
+            // console.log(this.senderName)
         }
     }
 }
 </script>
 <style scoped lang="scss">
 .editor {
-    height: 200px;
+  height: 200px;
 }
 </style>
 <style>

@@ -163,7 +163,6 @@ export default {
 
             })
         },
-
         createSupervisor(){
             this.dialogVisibleCreate = true
         },
