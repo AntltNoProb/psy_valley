@@ -12,13 +12,13 @@
                                 <el-avatar shape="square" :size="50" src="itemc.headUrl"/>
                             </el-col>
                             <el-col span="8" >{{itemc.from}}</el-col>
-                            <div class="tip-left">{{itemc.payload.text}}</div>
+                            <div class="tip-left">{{messageContent(itemc)}}</div>
                         </el-row>
                         <el-row gutter="10" v-else type="flex" justify="end">
                             <el-col span="12">
-                                <div class="tip-right">{{itemc.payload.text}}</div>
+                                <div class="tip-right">{{messageContent(itemc)}}</div>
                             </el-col>
-                            <el-col span="8">{{itemc.from}}</el-col>
+                            <el-col span="8">{{myname}}</el-col>
                             <el-col span="4"><el-avatar shape="square" :size="50" src="itemc.headUrl" /></el-col>
                         </el-row>
                     </div>
@@ -98,15 +98,27 @@ export default {
     },
     setup(){
       const route = useRoute();
-      let senderName = route.query.name;
+      let senderPno = ref(route.query.pno);
+      let senderName = ref(route.query.name);
+      console.log(senderName.value,'senderName');
+      console.log(senderPno.value,'senderPno');
       let imReady=ref(false);
-      let messageList=ref([]);
-      let updateIMStatus=(payload)=>{
-        imReady.value=payload;
+      let messageList = ref([]);
+      if(sessionStorage.getItem(senderPno.value)!=null){
+        let tmp = JSON.parse(sessionStorage.getItem(senderPno.value));
+        messageList.value=tmp;
+      }else {
+        messageList.value=[];
       }
+      // let messageList=ref(localStorage.getItem('message'));
+      // let updateIMStatus=(payload)=>{
+      //   imReady.value=payload;
+      // }
       let updateOtherSendToMeMsg=(payload)=>{
         if(payload.payload.text != null){
           messageList.value = [...messageList.value, payload];
+          let messageListJson = JSON.stringify(this.messageList);
+          sessionStorage.setItem(senderPno.value, messageListJson);
         }
         console.log(messageList.value, 'message======================');
       }
@@ -124,10 +136,10 @@ export default {
       globaltim.on(TIM.EVENT.MESSAGE_RECEIVED, onMessageReceived);
 
       return{
+        senderPno,
         senderName,
         imReady,
         messageList,
-        updateIMStatus,
         updateOtherSendToMeMsg
       }
     },
@@ -146,6 +158,7 @@ export default {
             message:'',
             userId: '',
             indexc: 1,
+            myname: JSON.parse(sessionStorage.getItem("user")).name
         }
     },
 
@@ -155,6 +168,9 @@ export default {
         },
     },
     computed:{
+      TIM() {
+        return TIM
+      }
         // ...mapState(['imReady', 'messageList'])
     },
     mounted() {
@@ -187,12 +203,31 @@ export default {
             console.log('onEditorChange: ', this.content)
         },
 
+        messageKind(payload){
+          return payload.type
+        },
+
+        messageContent(payload){
+          if(payload.type === TIM.TYPES.MSG_TEXT){
+            return payload.payload.text
+          }else if(payload.type === TIM.TYPES.MSG_IMAGE){
+            console.log(payload.payload.imageInfoArray, 'picture===================');
+            return payload.payload.imageInfoArray[2].url;
+          }
+        },
+
         updateMySendMsg(payload){
           this.messageList = [...this.messageList, payload];
+          let messageListJson = JSON.stringify(this.messageList);
+          sessionStorage.setItem(this.senderPno, messageListJson);
+          // console.log(sessionStorage.getItem('message'), 'sessionStorage=================');
         },
 
         sendMsg(){
             this.content = this.$refs.myLQuillEditor.quill.getText();
+            console.log(this.content);
+            let img = this.$refs.myLQuillEditor.quill.get;
+            console.log(img);
             console.log(globaltim, 'globaltim===================');
             console.log(this.imReady);
             // if(!this.imReady){
@@ -204,9 +239,8 @@ export default {
                 return
             }
             //发送消息
-            console.log(this.senderName,'sendToName===============');
             let message = globaltim.createTextMessage({
-                to: this.senderName,
+                to: this.senderPno,
                 conversationType: TIM.TYPES.CONV_C2C,
                 // 消息优先级，用于群聊（v2.4.2起支持）。如果某个群的消息超过了频率限制，后台会优先下发高优先级的消息，详细请参考：https://cloud.tencent.com/document/product/269/3663#.E6.B6.88.E6.81.AF.E4.BC.98.E5.85.88.E7.BA.A7.E4.B8.8E.E9.A2.91.E7.8E.87.E6.8E.A7.E5.88.B6)
                 // 支持的枚举值：TIM.TYPES.MSG_PRIORITY_HIGH, TIM.TYPES.MSG_PRIORITY_NORMAL（默认）, TIM.TYPES.MSG_PRIORITY_LOW, TIM.TYPES.MSG_PRIORITY_LOWEST
@@ -235,8 +269,7 @@ export default {
                 // 发送失败
                 console.warn('sendMessage error:', imError);
             });
-
-            console.log(this.senderName)
+          // console.log(this.senderName)
         }
     }
 }
@@ -251,6 +284,7 @@ export default {
         margin: 0;
         padding: 0;
     }
+    /*左三角*/
     .tip-left {
         margin: 20px;
         padding: 5px;
@@ -264,6 +298,7 @@ export default {
         -moz-border-radius: 5px;
         border-radius: 5px;
     }
+
     .tip-left:before, .tip-left:after {
         content: "";
         display: block;
@@ -276,10 +311,12 @@ export default {
         font-size: 0;
         line-height: 0;
     }
+
     .tip-left:after {
         left: -27px;
         border-color: transparent #FFF transparent transparent;
     }
+
     /*右三角*/
     .tip-right {
         margin: 20px;

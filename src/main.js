@@ -38,13 +38,13 @@ tim.registerPlugin({'tim-upload-plugin': TIMUploadPlugin});
 tim.registerPlugin({'tim-profanity-filter-plugin': TIMProfanityFilterPlugin});
 
 // eslint-disable-next-line no-unused-vars
-let onSdkReady = function(event) {
-    //定义状态变量，标识IM是否准备好
-    console.log('onSdkReady im ======================');
-    // store.commit('updateIMStatus', true);
-};
-//监听ready事件
-tim.on(TIM.EVENT.SDK_READY, onSdkReady);
+// let onSdkReady = function(event) {
+//     //定义状态变量，标识IM是否准备好
+//     console.log('onSdkReady im ======================');
+//     // store.commit('updateIMStatus', true);
+// };
+// //监听ready事件
+// tim.on(TIM.EVENT.SDK_READY, onSdkReady);
 
 // let onMessageReceived = function(event) {
 //     // event.data - 存储 Message 对象的数组 - [Message]

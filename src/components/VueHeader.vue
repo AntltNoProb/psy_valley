@@ -24,6 +24,7 @@
 <script>
 import {ArrowDown} from "@element-plus/icons";
 import circleURL from '@/assets/logo.png'
+import {globaltim} from "@/main";
 
 export default {
     name: "VueHeader",
@@ -44,6 +45,12 @@ export default {
     },
     methods:{
         exit(){
+            let promise = globaltim.logout();
+            promise.then(function(imResponse) {
+              console.log(imResponse.data); // 登出成功
+            }).catch(function(imError) {
+              console.warn('logout error:', imError);
+            });
             window.sessionStorage.clear();
             this.$router.push('/login');
         }

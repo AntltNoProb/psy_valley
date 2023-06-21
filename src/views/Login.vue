@@ -38,11 +38,6 @@ import request from "@/utils/request";
 import {mapMutations} from "vuex";
 import { ref } from "vue";
 import {ElMessage} from "element-plus";
-// import {genTestUserSig} from "@/IMdebug";
-// import {IM_APP_ID} from "@/IMconfig/im";
-// import TIM from "tim-js-sdk";
-//import store from "@/store";
-// import {globaltim} from "@/main";
 export default {
     // eslint-disable-next-line vue/multi-word-component-names
     name: "login",
@@ -64,7 +59,6 @@ export default {
                     {pattern:/^.{6,}$/,required: true, message: '密码格式错误', trigger: 'blur'}
                 ]
             }
-
         }
     },
     mounted() {
@@ -92,51 +86,24 @@ export default {
                                 type: 'success',
                                 message: '登录成功',
                             })
-
-                            // // TIM登录
-                            // console.log(this.form.username);
-                            // let userID = this.form.username;
-                            // let userSig = genTestUserSig(userID).userSig; //签名信息
-                            // console.log(userSig, 'userSig==============================');
-                            //
-                            // console.log(globaltim, 'globaltim==================');
-                            // try {
-                            //   // let options = {
-                            //   //   SDKAppID: IM_APP_ID // 接入时需要将0替换为您的即时通信 IM 应用的 SDKAppID
-                            //   // };
-                            //   // let tim = TIM.create(options);
-                            //   // // eslint-disable-next-line no-unused-vars
-                            //
-                            //   //定义状态变量，标识IM是否准备好
-                            //   console.log('onSdkReady im ======================');
-                            //   store.commit('updateIMStatus', true);
-                            //
-                            //   let response = globaltim.login({userID: userID, userSig: userSig});
-                            //   console.log(response, '登录后的信息===================================');
-                            //   // console.log('onSdkReady im ======================');
-                            //   // store.commit('updateIMStatus', true);
-                            //   //
-                            //   // console.log(tim);
-                            //   // let response = tim.login({userID: userID, userSig: userSig});
-                            //   // console.log(response, '登录后的信息===================================');
-                            // } catch (e){
-                            //   console.log(e, '登录错误');
-                            // }
-
                             sessionStorage.setItem("user", JSON.stringify(res.data.user))
                             this.$router.push("/")
 
-                        }else{
-
+                        }else if(res.code === "2"){
                             ElMessage({
                                 type: 'error',
-                                message: 'false',
-
+                                message: res.msg,
                             })
-
                             this.isPass = false
                             this.disabled = true
-
+                        }
+                        else{
+                            ElMessage({
+                                type: 'error',
+                                message: res.msg,
+                            })
+                            this.isPass = false
+                            this.disabled = true
                         }
                     })
                 }
