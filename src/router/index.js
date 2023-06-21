@@ -10,14 +10,14 @@ const routes = [
             {
                 path: 'home',
                 name: 'home',
-                component: () => {
-                    let user = sessionStorage.getItem('user');
-                    let authority = JSON.parse(user).authority;
-                    if (authority == 'SystemManager') return import('@/views/HomeAdmin.vue');
-                    if (authority == 'Counselor') return import('@/views/HomeCounselor.vue');
-                    return import('@/views/HomeSupervisor.vue');
-                }, // to modify 
-                // component: () => import('@/views/HomeAdmin.vue'), 
+                // component: () => {
+                //     let user = sessionStorage.getItem('user');
+                //     let authority = JSON.parse(user).authority;
+                //     if (authority == 'SystemManager') return import('@/views/HomeAdmin.vue');
+                //     if (authority == 'Counselor') return import('@/views/HomeCounselor.vue');
+                //     return import('@/views/HomeSupervisor.vue');
+                // }, // to modify 
+                component: () => import('@/views/Home.vue'), 
                 meta: {
                     roles: ['SystemManager', 'Consultant', 'Supervisors']
                 },
@@ -129,7 +129,7 @@ router.beforeEach((to, from, next) => {
     
     // const user = {name:'a', authority:'SystemManager'};
     // const user = {name:'c', authority:'Counselor'};
-    // const user = {name:'s', authority:'SuperVisor'};
+    // const user = {name:'s', authority:'Supervisor'};
     // sessionStorage.setItem("user", JSON.stringify(user));
     // console.log(from, to);
     // next();
