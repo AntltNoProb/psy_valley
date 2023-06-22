@@ -56,6 +56,7 @@ import {genTestUserSig} from "@/IMdebug";
 import TIM from "tim-js-sdk";
 // eslint-disable-next-line no-unused-vars
 import request from "@/utils/request";
+import router from "@/router";
 // eslint-disable-next-line no-unused-vars
 //import {ElMessage} from "element-plus";
 
@@ -99,7 +100,6 @@ export default {
             promise2.then(function(imResponse) {
               console.log(imResponse.data); // 更新资料成功
               console.log(JSON.parse(sessionStorage.getItem("user")).name, 'updateProfile');
-
             }).catch(function(imError) {
               console.warn('updateMyProfile error:', imError); // 更新资料失败的相关信息
             });
@@ -109,6 +109,21 @@ export default {
           console.warn('login error:', imError); // 登录失败的相关信息
         });
 
+      let onMessageReceived1 = function(event) {
+        // event.data - 存储 Message 对象的数组 - [Message]
+        console.log(event.data);
+        // 把发送来的消息更新到仓库
+        if(event.data[0].from !== supervisorName.value[0]) {
+          globaltim.off(TIM.EVENT.MESSAGE_RECEIVED, onMessageReceived1);
+          let message = [event.data[0]];
+          sessionStorage.setItem(event.data[0].from, JSON.stringify(message));
+          // console.log(sessionStorage.getItem(event.data[0].from),'session==');
+          router.push({path: 'chat', query:{'pno': event.data[0].from, 'name': event.data[0].nick}});
+        }
+      };
+
+      //监听发送来的消息
+      globaltim.on(TIM.EVENT.MESSAGE_RECEIVED, onMessageReceived1);
         let intervalId = setInterval(function (){
             let promise = globaltim.getConversationList();
             promise.then(function(imResponse) {
@@ -140,10 +155,9 @@ export default {
                         if(item.userProfile.userID !== supervisorUsername.value[0]){
                             visitorPnos.value=[...visitorPnos.value, item.userProfile.userID];
                             visitorNames.value=[...visitorNames.value, item.userProfile.nick];
-                        }else {
-                            currentVisitors.value -= 1
                         }
                     }
+                    currentVisitors.value=visitorNames.value.length;
                     console.log(visitorNames,'visitorNames');
                     console.log(visitorPnos, 'visitorPnos');
                 })

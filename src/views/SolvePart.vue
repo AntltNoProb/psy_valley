@@ -112,7 +112,8 @@ export default {
         let messageList = ref([]);
 
         if(sessionStorage.getItem(counselorUsername.value)!=null) {
-            let tmp = JSON.parse(sessionStorage.getItem(counselorUsername.value));
+          console.log(JSON.parse(sessionStorage.getItem(counselorUsername.value)), 'solvePart======');
+          let tmp = JSON.parse(sessionStorage.getItem(counselorUsername.value));
             messageList.value = [...messageList.value, ...tmp];
         }
         console.log(counselorUsername.value , "counselorUsername=========")

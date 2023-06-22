@@ -86,7 +86,10 @@ export default {
                                 type: 'success',
                                 message: '登录成功',
                             })
-                            sessionStorage.setItem("user", JSON.stringify(res.data.user))
+                            sessionStorage.setItem("user", JSON.stringify(res.data.user));
+                            let timestamp=new Date().getTime();
+                            console.log(JSON.stringify(timestamp), 'timestamp')
+                            sessionStorage.setItem("timestamp", JSON.stringify(timestamp));
                             this.$router.push("/")
 
                         }else if(res.code === "2"){

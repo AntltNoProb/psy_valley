@@ -57,9 +57,9 @@ import HeadTwo from "@/assets/head/head002.png";
 import TIM from "tim-js-sdk";
 import {quillEditor} from "vue-quill-editor/src";
 import {globaltim} from "@/main";
-//import {genTestUserSig} from "@/IMdebug";
 import {ref} from "vue";
 import {useRoute} from "vue-router";
+// import {genTestUserSig} from "@/IMdebug";
 
 const toolbarOptions = [
     // 加粗 斜体 下划线 删除线 -----['bold', 'italic', 'underline', 'strike']
@@ -104,14 +104,76 @@ export default {
       let senderName = ref(route.query.name);
       console.log(senderName.value,'senderName');
       console.log(senderPno.value,'senderPno');
-      let imReady=ref(false);
+
       let messageList = ref([]);
-      if(sessionStorage.getItem(senderPno.value)!=null){
-        let tmp = JSON.parse(sessionStorage.getItem(senderPno.value));
-        messageList.value=tmp;
-      }else {
-        messageList.value=[];
+      // if(sessionStorage.getItem(senderPno.value)!=null){
+      //   let tmp = JSON.parse(sessionStorage.getItem(senderPno.value));
+      //   messageList.value=tmp;
+      // }else {
+      //   messageList.value=[];
+      // }
+
+      // TIM登录
+      // let userinfo = sessionStorage.getItem("user")
+      // let userID = JSON.parse(userinfo).username;
+      // console.log(userID);
+      // let userSig = genTestUserSig(userID).userSig; //签名信息
+
+      // let promise1 = globaltim.login({userID: userID, userSig: userSig});
+      // promise1.then(function(imResponse) {
+      //   console.log(imResponse.data, "登录成功============="); // 登录成功
+      //   if (imResponse.data.repeatLogin === true) {
+      //     // 标识帐号已登录，本次登录操作为重复登录。v2.5.1 起支持
+      //     console.log(imResponse.data.errorInfo);
+      //   }
+      //   // eslint-disable-next-line no-unused-vars
+      //   globaltim.on(TIM.EVENT.SDK_READY, onSdkReady2);
+      // }).catch(function(imError) {
+      //   console.warn('login error:', imError); // 登录失败的相关信息
+      // });
+      function f1(nextReqMessageID){
+        let promise = globaltim.getMessageList({conversationID: 'C2C'+senderPno.value, nextReqMessageID});
+        promise.then(function(imResponse) {
+          messageList.value = [...messageList.value, ...imResponse.data.messageList]; // 消息列表。
+          const nextReqMessageID = imResponse.data.nextReqMessageID; // 用于续拉，分页续拉时需传入该字段。
+          const isCompleted = imResponse.data.isCompleted; // 表示是否已经拉完所有消息。
+          console.log(nextReqMessageID,'nextReqMessageID2========');
+          if(!isCompleted){
+            f1(nextReqMessageID)
+          }
+        });
       }
+      // eslint-disable-next-line no-unused-vars
+      let onSdkReady2 = function(event) {
+
+        let promise = globaltim.getMessageList({conversationID: 'C2C'+senderPno.value});
+        promise.then(function(imResponse) {
+          messageList.value = [...messageList.value, ...imResponse.data.messageList]; // 消息列表。
+          const nextReqMessageID = imResponse.data.nextReqMessageID; // 用于续拉，分页续拉时需传入该字段。
+          const isCompleted = imResponse.data.isCompleted; // 表示是否已经拉完所有消息。
+          console.log(nextReqMessageID,'nextReqMessageID1========');
+          if(!isCompleted){
+            f1(nextReqMessageID);
+          }
+          console.log(messageList,'finalMessageList');
+        });
+      };
+      globaltim.on(TIM.EVENT.SDK_READY, onSdkReady2);
+
+      // eslint-disable-next-line no-unused-vars
+      // let onSdkReady2 = function(event) {
+      //   let timestamp = JSON.parse(sessionStorage.getItem("timestamp"));
+      //   console.log('C2C'+senderPno.value, 'conversationID====');
+      //   console.log(timestamp, 'timestamp=====');
+      //   let promise = globaltim.getMessageListHopping({conversationID: 'C2C'+senderPno.value, time: timestamp, direction: 1});
+      //   promise.then(function(imResponse) {
+      //     messageList.value = imResponse.data.messageList; // 消息列表。
+      //     console.log(messageList, 'messageList');
+      //   });
+      // };
+      // globaltim.on(TIM.EVENT.SDK_READY, onSdkReady2);
+
+
       // let messageList=ref(localStorage.getItem('message'));
       // let updateIMStatus=(payload)=>{
       //   imReady.value=payload;
@@ -140,7 +202,6 @@ export default {
       return{
         senderPno,
         senderName,
-        imReady,
         messageList,
         updateOtherSendToMeMsg
       }
@@ -217,6 +278,10 @@ export default {
           }else if(payload.type === TIM.TYPES.MSG_IMAGE){
             console.log(payload.payload.imageInfoArray, 'picture===================');
             return payload.payload.imageInfoArray[2].url;
+          }else if(payload.type === TIM.TYPES.MSG_AUDIO){
+            return payload.payload.url;
+          }else if(payload.type === TIM.TYPES.MSG_MERGER){
+            return payload.payload;
           }
         },
 

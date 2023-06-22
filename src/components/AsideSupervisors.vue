@@ -60,6 +60,7 @@ import {onBeforeUnmount, ref} from "vue";
 import {genTestUserSig} from "@/IMdebug";
 import {globaltim} from "@/main";
 import TIM from "tim-js-sdk";
+import router from "@/router";
 export default {
     name:"AsideSupervisors",
     setup(){
@@ -121,6 +122,21 @@ export default {
                 console.warn('getConversationList error:', imError); // 获取会话列表失败的相关信息
             });
         }, 1000);
+
+      let onMessageReceived1 = function(event) {
+        // event.data - 存储 Message 对象的数组 - [Message]
+        console.log(event.data);
+        // 把发送来的消息更新到仓库
+        globaltim.off(TIM.EVENT.MESSAGE_RECEIVED, onMessageReceived1);
+        let message = [event.data[0]];
+        console.log(message,'message=======');
+        console.log(event.data[0].from,'from=======');
+        sessionStorage.setItem(event.data[0].from, JSON.stringify(message));
+        console.log(sessionStorage.getItem(event.data[0].from),'assistSession===');
+        router.push({path: 'solve', query:{'name': event.data[0].nick, 'username': event.data[0].from}});
+      };
+      //监听发送来的消息
+      globaltim.on(TIM.EVENT.MESSAGE_RECEIVED, onMessageReceived1);
 
         onBeforeUnmount(() => {
             clearInterval(intervalId)
