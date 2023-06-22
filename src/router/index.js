@@ -10,14 +10,14 @@ const routes = [
             {
                 path: 'home',
                 name: 'home',
-                component: () => {
-                    let user = sessionStorage.getItem('user');
-                    let authority = JSON.parse(user).authority;
-                    if (authority == 'SystemManager') return import('@/views/HomeAdmin.vue');
-                    if (authority == 'Counselor') return import('@/views/HomeCounselor.vue');
-                    if (authority == 'Supervisor')return import('@/views/HomeSupervisor.vue');
-                }, // to modify 
-                // component: () => import('@/views/HomeAdmin.vue'), 
+                // component: () => {
+                //     let user = sessionStorage.getItem('user');
+                //     let authority = JSON.parse(user).authority;
+                //     if (authority == 'SystemManager') return import('@/views/HomeAdmin.vue');
+                //     if (authority == 'Counselor') return import('@/views/HomeCounselor.vue');
+                //     return import('@/views/HomeSupervisor.vue');
+                // }, // to modify 
+                component: () => import('@/views/Home.vue'), 
                 meta: {
                     roles: ['SystemManager', 'Consultant', 'Supervisor']
                 },
