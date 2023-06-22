@@ -200,6 +200,7 @@ export default {
         onBeforeUnmount(() => {
           clearInterval(intervalId)
           intervalId = null;
+          globaltim.off(TIM.EVENT.MESSAGE_RECEIVED, onMessageReceived1)
         })
 
         return{

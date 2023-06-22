@@ -245,6 +245,7 @@ export default {
                 // 发送的消息更新代仓库，页面使用聊天记录自动更新
                 //this.updateMySendMsg(message);
                 // this.content = '';
+                // 清空聊天记录
                 sessionStorage.removeItem(this.supervisorUsername)
                 this.$router.push('home');
             }).catch(function(imError) {
@@ -252,8 +253,6 @@ export default {
                 console.warn('sendMessage error:', imError);
 
             });
-
-            // 清空聊天记录
         },
         scrollToBottom(){
             this.$refs.scrollbarRef.setScrollTop(this.$refs.innerRef.clientHeight);
