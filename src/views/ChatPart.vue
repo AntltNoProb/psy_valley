@@ -9,9 +9,9 @@
                     <div v-for="(itemc,indexc) in messageList" :key="indexc">
                         <el-row gutter="10" v-if = "itemc.flow === 'in'" type="flex" justify="start">
                             <el-col span="4" >
-                                <el-avatar shape="square" :size="50" src="itemc.headUrl"/>
+                                <el-avatar shape="square" :size="50" :src="headTwoUrl"/>
                             </el-col>
-                            <el-col span="8" >{{itemc.from}}</el-col>
+                            <el-col span="8" >{{senderName}}</el-col>
                             <div class="tip-left">{{messageContent(itemc)}}</div>
                         </el-row>
                         <el-row gutter="10" v-else type="flex" justify="end">
@@ -19,7 +19,7 @@
                                 <div class="tip-right">{{messageContent(itemc)}}</div>
                             </el-col>
                             <el-col span="8">{{myname}}</el-col>
-                            <el-col span="4"><el-avatar shape="square" :size="50" src="itemc.headUrl" /></el-col>
+                            <el-col span="4"><el-avatar shape="square" :size="50" :src="headOneUrl" /></el-col>
                         </el-row>
                     </div>
                 </div>
@@ -51,6 +51,8 @@
 import 'quill/dist/quill.core.css'
 import 'quill/dist/quill.snow.css'
 import 'quill/dist/quill.bubble.css'
+import HeadOne from "@/assets/head/head001.png";
+import HeadTwo from "@/assets/head/head002.png";
 // 注册 quillEditor
 import TIM from "tim-js-sdk";
 import {quillEditor} from "vue-quill-editor/src";
@@ -147,6 +149,8 @@ export default {
       return {
             slbHeight:'',
             clientHeight:'',
+          headOneUrl: HeadOne,
+          headTwoUrl: HeadTwo,
             content: '',//聊天的内容
             editorOption: {
                 modules: {
@@ -230,10 +234,7 @@ export default {
             console.log(img);
             console.log(globaltim, 'globaltim===================');
             console.log(this.imReady);
-            // if(!this.imReady){
-            //     alert('IM系统还未准备好');
-            //     return
-            // }
+
             if(this.content.trim() === ''){
                 alert('请输入聊天信息');
                 return

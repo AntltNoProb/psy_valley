@@ -3,7 +3,7 @@
         active-text-color="#ffd04b"
         background-color="#545c64"
         text-color="#fff"
-        style="width: 200px; min-height: calc(100vh - 90px) "
+        style="width: 200px; min-height: calc(100vh - 90px)"
         :default-active="$route.path"
         router
         :default-openeds="openeds"
@@ -68,7 +68,7 @@ export default {
         let visitorPnos=ref([]);
         let supervisorName=ref([]);
         let supervisorUsername=ref([]);
-      // eslint-disable-next-line no-unused-vars
+        //eslint-disable-next-line no-unused-vars
         let conversationList = ref([]);
         let currentVisitors = ref(0);
         let currentSupervisor = ref(0);
@@ -129,21 +129,26 @@ export default {
                   }
                   console.log(supervisorName,'supervisorName');
                   console.log(supervisorUsername,'supervisorPnos');
+                    conversationList.value = imResponse.data.conversationList; // 全量的会话列表，用该列表覆盖原有的会话列表
+                    // console.log(conversationList.value, 'conversation======');
+                    let item;
+                    visitorNames.value=[];
+                    currentVisitors.value=conversationList.value.length;
+                    visitorPnos.value=[];
+                    for (item of conversationList.value){
+                        console.log(item.userProfile.userID, 'item');
+                        if(item.userProfile.userID !== supervisorUsername.value[0]){
+                            visitorPnos.value=[...visitorPnos.value, item.userProfile.userID];
+                            visitorNames.value=[...visitorNames.value, item.userProfile.nick];
+                        }else {
+                            currentVisitors.value -= 1
+                        }
+                    }
+                    console.log(visitorNames,'visitorNames');
+                    console.log(visitorPnos, 'visitorPnos');
                 })
 
-                conversationList.value = imResponse.data.conversationList; // 全量的会话列表，用该列表覆盖原有的会话列表
-                // console.log(conversationList.value, 'conversation======');
-                let item;
-                visitorNames.value=[];
-                currentVisitors.value=conversationList.value.length;
-                visitorPnos.value=[];
-                for (item of conversationList.value){
-                  console.log(item.userProfile.userID, 'item');
-                  visitorPnos.value=[...visitorPnos.value, item.userProfile.userID];
-                  visitorNames.value=[...visitorNames.value, item.userProfile.nick];
-                }
-                console.log(visitorNames,'visitorNames');
-                console.log(visitorPnos, 'visitorPnos');
+
             }).catch(function(imError) {
                 console.warn('getConversationList error:', imError); // 获取会话列表失败的相关信息
             });

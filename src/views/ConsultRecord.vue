@@ -1,5 +1,28 @@
 <template>
     <div style="padding: 10px">
+        <el-dialog title="详情" v-model="dialogFormVisible">
+            <div style="width:100%">
+                <el-scrollbar>
+                    <div v-for="(itemc,indexc) in messageList" :key="indexc">
+                        <el-row gutter="10" v-if = "itemc.flow === 'in'" type="flex" justify="start">
+                            <el-col span="4" >
+                                <el-avatar shape="square" :size="50" src="itemc.headUrl"/>
+                            </el-col>
+                            <el-col span="8" >{{itemc.from}}</el-col>
+                            <div class="tip-left">{{itemc}}</div>
+                        </el-row>
+                        <el-row gutter="10" v-else type="flex" justify="end">
+                            <el-col span="12">
+                                <div class="tip-right">{{itemc}}</div>
+                            </el-col>
+                            <el-col span="8">{{itemc.from}}</el-col>
+                            <el-col span="4"><el-avatar shape="square" :size="50" src="itemc.headUrl" /></el-col>
+                        </el-row>
+                    </div>
+                </el-scrollbar>
+            </div>
+        </el-dialog>
+
         <div style="margin: 10px 0">
             <el-input v-model="searchVisitor" placeholder="请输入访客姓名"  style="width: 20%" clearable />
             <el-button type="primary" style="margin-left: 7px" @click="load">查询访客姓名</el-button>
@@ -16,7 +39,6 @@
                     start-placeholder="开始日期"
                     end-placeholder="结束日期"
                     @change="dateFormat"
-
                 />
             </el-config-provider>
             <el-popconfirm title="确认要全部导出吗?" @confirm="exportAll">
@@ -34,7 +56,7 @@
             <el-table-column prop="starttime" label="咨询日期"  sortable/>
             <el-table-column label="操作">
                 <template #default="scope">
-                    <el-button type="primary" @click="consultDetails">查看详情</el-button>
+                    <el-button type="primary" @click="this.dialogFormVisible = true">查看详情</el-button>
                     <el-popconfirm title="确认要导出吗?" @confirm="HandleExport(scope.row.id)">
                         <template #reference>
                             <el-button size="small">导出</el-button>
@@ -53,6 +75,7 @@
                     background >
             </el-pagination>
         </div>
+
     </div>
 </template>
 <script>
@@ -65,11 +88,13 @@ export default {
     },
     data() {
         return {
+            dialogFormVisible: false,
             param: {
                 startTime: '',
                 endTime: '',
                 date: '',
             },
+            messageList:[],
             form:{},
             searchVisitor: '',
             searchCounselor:'',
@@ -148,10 +173,8 @@ export default {
                     console.log('下载的文件出错',e)
                 }
             }).catch(()=>{
-
             })
         },
-
         handleCurrentChange(){
             this.load()
         },

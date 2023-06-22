@@ -9,9 +9,9 @@
                     <div v-for="(itemc,indexc) in messageList" :key="indexc">
                         <el-row gutter="10" v-if = "itemc.flow === 'in'" type="flex" justify="start">
                             <el-col span="4" >
-                                <el-avatar shape="square" :size="50" src="itemc.headUrl"/>
+                                <el-avatar shape="square" :size="50" :src="headTwoUrl"/>
                             </el-col>
-                            <el-col span="8" >{{itemc.from}}</el-col>
+                            <el-col span="8" >{{counselorName}}</el-col>
                             <div class="tip-left">{{messageContent(itemc)}}</div>
                         </el-row>
                         <el-row gutter="10" v-else type="flex" justify="end">
@@ -19,7 +19,7 @@
                                 <div class="tip-right">{{messageContent(itemc)}}</div>
                             </el-col>
                             <el-col span="8">{{myname}}</el-col>
-                            <el-col span="4"><el-avatar shape="square" :size="50" src="itemc.headUrl" /></el-col>
+                            <el-col span="4"><el-avatar shape="square" :size="50" :src="headOneUrl" /></el-col>
                         </el-row>
                     </div>
                 </div>
@@ -57,7 +57,10 @@ import {quillEditor} from "vue-quill-editor/src";
 import {globaltim} from "@/main";
 //import {genTestUserSig} from "@/IMdebug";
 import {ref} from "vue";
-import {useRoute} from "vue-router";
+import {useRoute,useRouter} from "vue-router";
+
+import HeadOne from "@/assets/head/head001.png";
+import HeadTwo from "@/assets/head/head002.png";
 
 const toolbarOptions = [
     // 加粗 斜体 下划线 删除线 -----['bold', 'italic', 'underline', 'strike']
@@ -98,30 +101,21 @@ export default {
     },
     setup(){
         const route = useRoute();
+
         let counselorUsername = ref(route.query.username);
         let counselorName = ref(route.query.name);
 
         let imReady=ref(false);
+
+        const router = useRouter()
+
         let messageList = ref([]);
-        if(sessionStorage.getItem(counselorUsername.value+"his")!=null){
-            let tmp = JSON.parse(sessionStorage.getItem(counselorUsername.value+"his"));
-            messageList.value=tmp;
-        }else {
-            messageList.value=[];
-        }
 
         if(sessionStorage.getItem(counselorUsername.value)!=null) {
             let tmp = JSON.parse(sessionStorage.getItem(counselorUsername.value));
-            messageList.value = [...messageList.value, tmp];
+            messageList.value = [...messageList.value, ...tmp];
         }
-        // }else {
-        //     messageList.value=[];
-        // }
-
-        // let messageList=ref(localStorage.getItem('message'));
-        // let updateIMStatus=(payload)=>{
-        //   imReady.value=payload;
-        // }
+        console.log(counselorUsername.value , "counselorUsername=========")
         let updateOtherSendToMeMsg=(payload)=>{
             if(payload.payload.text != null){
                 messageList.value = [...messageList.value, payload];
@@ -134,12 +128,17 @@ export default {
         // TIM监听接收消息
         let onMessageReceived = function(event) {
             // event.data - 存储 Message 对象的数组 - [Message]
-            console.log(event.data);
+            console.log(event.data,'event.data=====');
             // 把发送来的消息更新到仓库
-            if(event.data[0]!=='') {
+            if(event.data[0].payload.text !== '') {
+                if(event.data[0].payload.text === 'TERMINATE'){
+                    sessionStorage.removeItem(counselorUsername.value)
+                    router.push('/home')
+                }
                 updateOtherSendToMeMsg(event.data[0])
             }
         };
+
         //监听发送来的消息
         globaltim.on(TIM.EVENT.MESSAGE_RECEIVED, onMessageReceived);
 
@@ -150,11 +149,14 @@ export default {
             messageList,
             updateOtherSendToMeMsg
         }
+
     },
     data(){
         return {
             slbHeight:'',
             clientHeight:'',
+            headOneUrl: HeadOne,
+            headTwoUrl: HeadTwo,
             content: '',//聊天的内容
             editorOption: {
                 modules: {
@@ -179,7 +181,6 @@ export default {
         TIM() {
             return TIM
         }
-        // ...mapState(['imReady', 'messageList'])
     },
     mounted() {
         this.clientHeight = `${document.documentElement.clientHeight}`;//获取浏览器可视区域高度

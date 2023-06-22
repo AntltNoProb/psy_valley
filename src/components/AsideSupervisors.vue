@@ -42,7 +42,7 @@
                 <span>会话管理</span>
             </template>
             <el-menu-item-group title="解决求助">
-                <el-menu-item v-for="(o, cnt) in currentCounselors" :key="o" @click="$router.push({path: 'solve', query:{name: counselorName[cnt]}})">
+                <el-menu-item v-for="(o, cnt) in currentCounselors" :key="o" @click="$router.push({path: 'solve', query:{'name': counselorName[cnt], 'username': counselorUsername[cnt]}})">
                     <span>{{counselorName[cnt]}}</span>
                 </el-menu-item>
             </el-menu-item-group>
@@ -55,7 +55,6 @@ import {
     Menu as IconMenu,
     Setting,
     ArrowDown ,
-
 } from '@element-plus/icons'
 import {onBeforeUnmount, ref} from "vue";
 import {genTestUserSig} from "@/IMdebug";
@@ -84,49 +83,16 @@ export default {
                 // 标识帐号已登录，本次登录操作为重复登录。v2.5.1 起支持
                 console.log(imResponse.data.errorInfo);
             }
-            // eslint-disable-next-line no-unused-vars
+            //eslint-disable-next-line no-unused-vars
             let onSdkReady = function(event) {
                 // 修改个人标配资料
                 let promise2 = globaltim.updateMyProfile({
                     nick: JSON.parse(sessionStorage.getItem("user")).name,
-                    // avatar: 'http(s)://url/to/image.jpg',
-                    // gender: TIM.TYPES.GENDER_MALE,
-                    // selfSignature: '我的个性签名',
-                    // allowType: TIM.TYPES.ALLOW_TYPE_ALLOW_ANY
+
                 });
                 promise2.then(function(imResponse) {
                     console.log(imResponse.data); // 更新资料成功
                     console.log(JSON.parse(sessionStorage.getItem("user")).name, 'updateProfile');
-
-                    // let updateOtherSendToMeMsg=(payload)=>{
-                    //     if(payload.payload.text != null){
-                    //         let tmpMessageList=[];
-                    //         if(sessionStorage.getItem(payload.from+"his")!=null){
-                    //             let tmp = JSON.parse(sessionStorage.getItem(payload.from+"his"));
-                    //             tmpMessageList=tmp;
-                    //             tmpMessageList = [...tmpMessageList, payload];
-                    //             let tmpMessageListJson = JSON.stringify(tmpMessageList);
-                    //             sessionStorage.setItem(payload.from+"his", tmpMessageListJson);
-                    //         }else {
-                    //             tmpMessageList = [payload];
-                    //             let tmpMessageListJson = JSON.stringify(tmpMessageList);
-                    //             sessionStorage.setItem(payload.from+"his", tmpMessageListJson);
-                    //         }
-                    //         console.log(tmpMessageList, 'tmpMessageList======================');
-                    //     }
-                    // }
-
-                    // // TIM监听接收消息
-                    // let onMessageReceived = function(event) {
-                    //     // event.data - 存储 Message 对象的数组 - [Message]
-                    //     console.log(event.data);
-                    //     // 把发送来的消息更新到仓库
-                    //     if(event.data[0]!=='') {
-                    //         updateOtherSendToMeMsg(event.data[0])
-                    //     }
-                    // };
-                    // //监听发送来的消息
-                    // globaltim.on(TIM.EVENT.MESSAGE_RECEIVED, onMessageReceived);
 
                 }).catch(function(imError) {
                     console.warn('updateMyProfile error:', imError); // 更新资料失败的相关信息
@@ -140,7 +106,6 @@ export default {
         let intervalId = setInterval(function (){
             let promise = globaltim.getConversationList();
             promise.then(function(imResponse) {
-
                 conversationList.value = imResponse.data.conversationList; // 全量的会话列表，用该列表覆盖原有的会话列表
                 // console.log(conversationList.value, 'conversation======');
                 let item;
@@ -152,7 +117,6 @@ export default {
                     counselorUsername.value=[...counselorUsername.value, item.userProfile.userID];
                     counselorName.value=[...counselorName.value, item.userProfile.nick];
                 }
-
             }).catch(function(imError) {
                 console.warn('getConversationList error:', imError); // 获取会话列表失败的相关信息
             });
@@ -167,7 +131,6 @@ export default {
             counselorName,
             counselorUsername,
             currentCounselors,
-
         }
     },
     data(){
@@ -184,6 +147,5 @@ export default {
         ArrowDown ,
         IconMenu,
     },
-
 }
 </script>

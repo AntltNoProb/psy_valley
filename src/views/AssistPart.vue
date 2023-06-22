@@ -9,9 +9,9 @@
                     <div v-for="(itemc,indexc) in messageList" :key="indexc">
                         <el-row gutter="10" v-if = "itemc.flow === 'in'" type="flex" justify="start">
                             <el-col span="4" >
-                                <el-avatar shape="square" :size="50" src="itemc.headUrl"/>
+                                <el-avatar shape="square" :size="50" :src="headTwoUrl"/>
                             </el-col>
-                            <el-col span="8" >{{itemc.from}}</el-col>
+                            <el-col span="8" >{{supervisorName}}</el-col>
                             <div class="tip-left">{{messageContent(itemc)}}</div>
                         </el-row>
                         <el-row gutter="10" v-else type="flex" justify="end">
@@ -19,7 +19,7 @@
                                 <div class="tip-right">{{messageContent(itemc)}}</div>
                             </el-col>
                             <el-col span="8">{{myname}}</el-col>
-                            <el-col span="4"><el-avatar shape="square" :size="50" src="itemc.headUrl" /></el-col>
+                            <el-col span="4"><el-avatar shape="square" :size="50" :src="headOneUrl" /></el-col>
                         </el-row>
                     </div>
                 </div>
@@ -52,6 +52,8 @@
 import 'quill/dist/quill.core.css'
 import 'quill/dist/quill.snow.css'
 import 'quill/dist/quill.bubble.css'
+import HeadOne from "@/assets/head/head001.png";
+import HeadTwo from "@/assets/head/head002.png";
 // 注册 quillEditor
 import TIM from "tim-js-sdk";
 import {quillEditor} from "vue-quill-editor/src";
@@ -59,6 +61,8 @@ import {globaltim} from "@/main";
 //import {genTestUserSig} from "@/IMdebug";
 import {ref} from "vue";
 import {useRoute} from "vue-router";
+
+// import request from "@/utils/request";
 
 const toolbarOptions = [
     // 加粗 斜体 下划线 删除线 -----['bold', 'italic', 'underline', 'strike']
@@ -99,22 +103,24 @@ export default {
     },
     setup(){
         const startTime = new Date();
+
         const route = useRoute();
-        let supervisorName = route.query.name;
-        let supervisorUsername = route.query.username;
+
+        let supervisorName = ref(route.query.name);
+        let supervisorUsername = ref(route.query.username);
+
         let imReady=ref(false);
         let messageList = ref([]);
-        if(sessionStorage.getItem('message')!=null){
-            let tmp = JSON.parse(sessionStorage.getItem('message'));
-            messageList.value=tmp;
-        }else {
-            messageList.value=[];
+
+        if(sessionStorage.getItem(supervisorUsername.value)!=null){
+            let tmp = JSON.parse(sessionStorage.getItem(supervisorUsername.value));
+            messageList.value = [...messageList.value, ...tmp];
         }
         let updateOtherSendToMeMsg=(payload)=>{
             if(payload.payload.text != null){
                 messageList.value = [...messageList.value, payload];
                 let messageListJson = JSON.stringify(this.messageList);
-                sessionStorage.setItem('message', messageListJson);
+                sessionStorage.setItem(supervisorUsername.value, messageListJson);
             }
             console.log(messageList.value, 'message======================');
         }
@@ -143,6 +149,14 @@ export default {
 
     data(){
         return {
+            headOneUrl: HeadOne,
+            headTwoUrl: HeadTwo,
+            form:{
+              s_username:'',
+              c_username:'',
+              duration:'',
+              date:'',
+            },
             slbHeight:'',
             clientHeight:'',
             endTime:'',
@@ -191,7 +205,11 @@ export default {
             const minutes = Math.floor((diff % 3600) / 60); // 计算分钟数
             const seconds = Math.floor(diff % 60); // 计算秒数
             // 格式化时间差为 hh:mm:ss
-            this.timeDiff = `${this.padZero(hours)}:${this.padZero(minutes)}:${this.padZero(seconds)}`;
+            this.timeDiff = `${this.padZero(hours)}:${this.padZero(minutes)}:${this.padZero(seconds)}`
+            this.form.duration = this.timeDiff
+            this.form.date = this.startTime
+            this.form.c_username = JSON.parse(sessionStorage.getItem("user")).username
+            this.form.s_username = this.supervisorUsername
         },
         padZero(num) {
             return String(num).padStart(2, '0'); // 补零，确保两位数格式
@@ -201,10 +219,39 @@ export default {
             this.calculateTimeDiff();
             console.log(this.timeDiff);
 
-            //保存求助记录
+            //request.post('assist/insert',this.form)
 
-            this.$router.back();
-            this.$destroy();
+            let message = globaltim.createTextMessage({
+                to: this.supervisorUsername,
+                conversationType: TIM.TYPES.CONV_C2C,
+                // 消息优先级，用于群聊（v2.4.2起支持）。如果某个群的消息超过了频率限制，后台会优先下发高优先级的消息，详细请参考：https://cloud.tencent.com/document/product/269/3663#.E6.B6.88.E6.81.AF.E4.BC.98.E5.85.88.E7.BA.A7.E4.B8.8E.E9.A2.91.E7.8E.87.E6.8E.A7.E5.88.B6)
+                // 支持的枚举值：TIM.TYPES.MSG_PRIORITY_HIGH, TIM.TYPES.MSG_PRIORITY_NORMAL（默认）, TIM.TYPES.MSG_PRIORITY_LOW, TIM.TYPES.MSG_PRIORITY_LOWEST
+                // priority: TIM.TYPES.MSG_PRIORITY_NORMAL,
+                payload: {
+                    text: 'TERMINATE'
+                },
+                // v2.20.0起支持C2C消息已读回执功能，如果您发消息需要已读回执，需购买旗舰版套餐，并且创建消息时将 needReadReceipt 设置为 true
+                needReadReceipt: true
+                // 消息自定义数据（云端保存，会发送到对端，程序卸载重装后还能拉取到，v2.10.2起支持）
+                // cloudCustomData: 'your cloud custom data'
+            });
+            // 2. 发送消息
+            let promise = globaltim.sendMessage(message);
+            promise.then((imResponse) => {
+                // 发送成功
+                console.log(imResponse, '结束求助发送成功');
+                // 发送的消息更新代仓库，页面使用聊天记录自动更新
+                //this.updateMySendMsg(message);
+                // this.content = '';
+                sessionStorage.removeItem(this.supervisorUsername)
+                this.$router.push('home');
+            }).catch(function(imError) {
+                // 发送失败
+                console.warn('sendMessage error:', imError);
+
+            });
+
+            // 清空聊天记录
         },
         scrollToBottom(){
             this.$refs.scrollbarRef.setScrollTop(this.$refs.innerRef.clientHeight);
@@ -240,21 +287,15 @@ export default {
         updateMySendMsg(payload){
             this.messageList = [...this.messageList, payload];
             let messageListJson = JSON.stringify(this.messageList);
-            sessionStorage.setItem('message', messageListJson);
-            console.log(sessionStorage.getItem('message'), 'sessionStorage=================');
+            sessionStorage.setItem(this.supervisorUsername, messageListJson);
+            console.log(sessionStorage.getItem(this.supervisorUsername), 'sessionStorage=================');
         },
 
         sendMsg(){
             this.content = this.$refs.myLQuillEditor.quill.getText();
             console.log(this.content);
-            //let img = this.$refs.myLQuillEditor.quill.get;
-           // console.log(img);
             console.log(globaltim, 'globaltim===================');
             console.log(this.imReady);
-            // if(!this.imReady){
-            //     alert('IM系统还未准备好');
-            //     return
-            // }
             if(this.content.trim() === ''){
                 alert('请输入聊天信息');
                 return

@@ -2,7 +2,7 @@
         <div class="login" @keyup.enter="login" >
             <div class="login-block">
                 <div style="font-size: 30px;text-align: center; padding: 30px 0">欢迎登录心声谷</div>
-                <el-form ref="form" :model="form" size="normal" :rules="rules" style="z-index: 0">
+                <el-form ref="form" :model="form" size="default" :rules="rules" style="z-index: 0">
                     <el-form-item prop="username">
                         <el-input v-model="form.username" placeholder="用户名">
                             <template #prefix>
@@ -53,7 +53,7 @@ export default {
             // 表单验证，需要在 el-form-item 元素中增加 prop 属性
             rules: {
                 username: [
-                    {pattern: /^[a-zA-Z0-9\u4e00-\u9fa5\\s]{2,32}$/,required: true, message: '用户名格式错误', trigger: 'blur'}
+                    {pattern: /^[\u4e00-\u9fa5\w]{2,32}$/,required: true, message: '用户名格式错误', trigger: 'blur'}
                 ],
                 password: [
                     {pattern:/^.{6,}$/,required: true, message: '密码格式错误', trigger: 'blur'}
