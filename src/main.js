@@ -7,6 +7,8 @@ import 'element-plus/dist/index.css'
 import Store from './store'
 import {IM_APP_ID} from "@/IMconfig/im";
 
+
+import audio from 'vue-mobile-audio'
 import Quill from "vue-quill-editor"
 
 import 'echarts';
@@ -59,10 +61,8 @@ tim.registerPlugin({'tim-profanity-filter-plugin': TIMProfanityFilterPlugin});
 
 
 const app = createApp(App);
-// app.config.globalProperties.$tim = tim;
-// app.config.globalProperties.$TIM = TIM;
 
-app.use(ElementPlus).use(Quill).use(Store).use(Router).component('v-chart', VECharts).mount('#app')
+
+app.use(ElementPlus).use(Quill).use(Store).use(Router).use(audio).component('v-chart', VECharts).mount('#app')
 export const globaltim = tim;
 
-// createApp(App).use(ElementPlus).use(Store).use(Router).mount('#app')

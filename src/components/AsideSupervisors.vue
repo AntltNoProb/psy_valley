@@ -36,6 +36,16 @@
             <el-icon><setting /></el-icon>
             <template #title>账户设置</template>
         </el-menu-item>
+        <el-dialog title="通知" v-model="dialogVisible">
+            <el-text>有新的消息</el-text>
+            <template #footer>
+                      <span class="dialog-footer">
+                          <el-button type="danger" size="default" @click="dialogVisible = false">取消</el-button>
+                          <el-button type="primary" size="default"
+                                     @click="this.$router.push({path:'solve',query:{'name': counselorname, 'username':counselorusername}});dialogVisible = false">确定</el-button>
+                      </span>
+            </template>
+        </el-dialog>
         <el-sub-menu index="1">
             <template #title>
                 <el-icon><IconMenu /></el-icon>
@@ -60,7 +70,6 @@ import {onBeforeUnmount, ref} from "vue";
 import {genTestUserSig} from "@/IMdebug";
 import {globaltim} from "@/main";
 import TIM from "tim-js-sdk";
-import router from "@/router";
 export default {
     name:"AsideSupervisors",
     setup(){
@@ -70,7 +79,7 @@ export default {
         // eslint-disable-next-line no-unused-vars
         let conversationList = ref([]);
         let currentCounselors = ref(0);
-
+        let dialogVisible = ref(false);
         // TIM登录
         let userinfo = sessionStorage.getItem("user")
         let userID = JSON.parse(userinfo).username;
@@ -123,20 +132,26 @@ export default {
             });
         }, 1000);
 
-      let onMessageReceived1 = function(event) {
+        let counselorname=ref('');
+        let counselorusername=ref('');
+      let onMessageReceived = function(event) {
         // event.data - 存储 Message 对象的数组 - [Message]
         console.log(event.data);
         // 把发送来的消息更新到仓库
-        globaltim.off(TIM.EVENT.MESSAGE_RECEIVED, onMessageReceived1);
+        globaltim.off(TIM.EVENT.MESSAGE_RECEIVED, onMessageReceived);
         let message = [event.data[0]];
         console.log(message,'message=======');
         console.log(event.data[0].from,'from=======');
         sessionStorage.setItem(event.data[0].from, JSON.stringify(message));
         console.log(sessionStorage.getItem(event.data[0].from),'assistSession===');
-        router.push({path: 'solve', query:{'name': event.data[0].nick, 'username': event.data[0].from}});
+
+        dialogVisible.value=true;
+        counselorusername.value = event.data[0].from;
+        counselorname.value=event.data[0].nick;
+        //router.push({path: 'solve', query:{'name': event.data[0].nick, 'username': event.data[0].from}});
       };
       //监听发送来的消息
-      globaltim.on(TIM.EVENT.MESSAGE_RECEIVED, onMessageReceived1);
+      globaltim.on(TIM.EVENT.MESSAGE_RECEIVED, onMessageReceived);
 
         onBeforeUnmount(() => {
             clearInterval(intervalId)
@@ -144,6 +159,9 @@ export default {
         })
 
         return{
+            dialogVisible,
+            counselorusername,
+            counselorname,
             counselorName,
             counselorUsername,
             currentCounselors,

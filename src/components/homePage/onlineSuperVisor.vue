@@ -20,7 +20,7 @@
                                 >
                                     {{ supervisor.busy ? '忙碌' : '空闲' }}
                                 </el-tag>
-                        </el-col>
+                            </el-col>
                             </el-tooltip>
                                 
                     </el-row>

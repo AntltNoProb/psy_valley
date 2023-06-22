@@ -29,6 +29,15 @@
                 <el-icon><IconMenu /></el-icon>
                 <span>会话管理</span>
             </template>
+            <el-dialog title="通知" v-model="dialogVisible">
+                <el-text>有新的消息</el-text>
+                <template #footer>
+                      <span class="dialog-footer">
+                          <el-button type="danger" size="default" @click="dialogVisible = false">取消</el-button>
+                          <el-button type="primary" size="default" @click="this.$router.push({path:'chat',query:{'pno': vistorPno, 'name': vistorName}});dialogVisible = false">确定</el-button>
+                      </span>
+                </template>
+            </el-dialog>
             <el-menu-item-group title="咨询">
                 <el-menu-item v-for="(o, cnt) in currentVisitors" :key="o" @click="$router.push({path: 'chat', query:{'pno': visitorPnos[cnt], 'name': visitorNames[cnt]}})">
                     <span>{{visitorNames[cnt]}}</span>
@@ -54,9 +63,9 @@ import {onBeforeUnmount, ref} from "vue";
 import {globaltim} from "@/main";
 import {genTestUserSig} from "@/IMdebug";
 import TIM from "tim-js-sdk";
-// eslint-disable-next-line no-unused-vars
+//eslint-disable-next-line no-unused-vars
 import request from "@/utils/request";
-import router from "@/router";
+//import router from "@/router";
 // eslint-disable-next-line no-unused-vars
 //import {ElMessage} from "element-plus";
 
@@ -109,21 +118,41 @@ export default {
           console.warn('login error:', imError); // 登录失败的相关信息
         });
 
+        let vistorPno = ref('');
+        let vistorName = ref('');
+        let dialogVisible = ref(false);
+
       let onMessageReceived1 = function(event) {
         // event.data - 存储 Message 对象的数组 - [Message]
         console.log(event.data);
         // 把发送来的消息更新到仓库
         if(event.data[0].from !== supervisorName.value[0]) {
           globaltim.off(TIM.EVENT.MESSAGE_RECEIVED, onMessageReceived1);
-          let message = [event.data[0]];
-          sessionStorage.setItem(event.data[0].from, JSON.stringify(message));
-          // console.log(sessionStorage.getItem(event.data[0].from),'session==');
-          router.push({path: 'chat', query:{'pno': event.data[0].from, 'name': event.data[0].nick}});
+
+          if(sessionStorage.getItem(event.data[0].from) != null){
+              let tmp = JSON.parse(sessionStorage.getItem(event.data[0].from))
+              console.log(tmp, 'tmp');
+              let message = [...tmp, event.data[0]];
+              sessionStorage.setItem(event.data[0].from, JSON.stringify(message));
+          }else {
+              let message = [event.data[0]];
+              sessionStorage.setItem(event.data[0].from, JSON.stringify(message));
+          }
+            // sessionStorage.setItem(event.data[0].from, JSON.stringify(message));
+          console.log(JSON.parse(sessionStorage.getItem('user')).bind_username,'okok===========');
+          console.log(JSON.parse(sessionStorage.getItem('user')).username,'okok===========');
+          if(JSON.parse(sessionStorage.getItem('user')).bind_username != event.data[0].from){
+                vistorPno.value=event.data[0].from;
+                vistorName.value=event.data[0].nick;
+                dialogVisible.value=true;
+          }
         }
       };
 
       //监听发送来的消息
       globaltim.on(TIM.EVENT.MESSAGE_RECEIVED, onMessageReceived1);
+
+
         let intervalId = setInterval(function (){
             let promise = globaltim.getConversationList();
             promise.then(function(imResponse) {
@@ -174,8 +203,11 @@ export default {
         })
 
         return{
+            vistorPno,
+            vistorName,
             visitorNames,
             visitorPnos,
+            dialogVisible,
             supervisorName,
             supervisorUsername,
             currentVisitors,

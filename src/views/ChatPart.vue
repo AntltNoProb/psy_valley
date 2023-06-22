@@ -106,59 +106,41 @@ export default {
       console.log(senderPno.value,'senderPno');
 
       let messageList = ref([]);
-      // if(sessionStorage.getItem(senderPno.value)!=null){
-      //   let tmp = JSON.parse(sessionStorage.getItem(senderPno.value));
-      //   messageList.value=tmp;
-      // }else {
-      //   messageList.value=[];
-      // }
-
-      // TIM登录
-      // let userinfo = sessionStorage.getItem("user")
-      // let userID = JSON.parse(userinfo).username;
-      // console.log(userID);
-      // let userSig = genTestUserSig(userID).userSig; //签名信息
-
-      // let promise1 = globaltim.login({userID: userID, userSig: userSig});
-      // promise1.then(function(imResponse) {
-      //   console.log(imResponse.data, "登录成功============="); // 登录成功
-      //   if (imResponse.data.repeatLogin === true) {
-      //     // 标识帐号已登录，本次登录操作为重复登录。v2.5.1 起支持
-      //     console.log(imResponse.data.errorInfo);
-      //   }
-      //   // eslint-disable-next-line no-unused-vars
-      //   globaltim.on(TIM.EVENT.SDK_READY, onSdkReady2);
-      // }).catch(function(imError) {
-      //   console.warn('login error:', imError); // 登录失败的相关信息
-      // });
-      function f1(nextReqMessageID){
-        let promise = globaltim.getMessageList({conversationID: 'C2C'+senderPno.value, nextReqMessageID});
-        promise.then(function(imResponse) {
-          messageList.value = [...messageList.value, ...imResponse.data.messageList]; // 消息列表。
-          const nextReqMessageID = imResponse.data.nextReqMessageID; // 用于续拉，分页续拉时需传入该字段。
-          const isCompleted = imResponse.data.isCompleted; // 表示是否已经拉完所有消息。
-          console.log(nextReqMessageID,'nextReqMessageID2========');
-          if(!isCompleted){
-            f1(nextReqMessageID)
-          }
-        });
+      if(sessionStorage.getItem(senderPno.value)!=null){
+        let tmp = JSON.parse(sessionStorage.getItem(senderPno.value));
+        messageList.value=tmp;
+      }else {
+        messageList.value=[];
       }
-      // eslint-disable-next-line no-unused-vars
-      let onSdkReady2 = function(event) {
 
-        let promise = globaltim.getMessageList({conversationID: 'C2C'+senderPno.value});
-        promise.then(function(imResponse) {
-          messageList.value = [...messageList.value, ...imResponse.data.messageList]; // 消息列表。
-          const nextReqMessageID = imResponse.data.nextReqMessageID; // 用于续拉，分页续拉时需传入该字段。
-          const isCompleted = imResponse.data.isCompleted; // 表示是否已经拉完所有消息。
-          console.log(nextReqMessageID,'nextReqMessageID1========');
-          if(!isCompleted){
-            f1(nextReqMessageID);
-          }
-          console.log(messageList,'finalMessageList');
-        });
-      };
-      globaltim.on(TIM.EVENT.SDK_READY, onSdkReady2);
+      // function f1(nextReqMessageID){
+      //   let promise = globaltim.getMessageList({conversationID: 'C2C'+senderPno.value, nextReqMessageID});
+      //   promise.then(function(imResponse) {
+      //     messageList.value = [...messageList.value, ...imResponse.data.messageList]; // 消息列表。
+      //     const nextReqMessageID = imResponse.data.nextReqMessageID; // 用于续拉，分页续拉时需传入该字段。
+      //     const isCompleted = imResponse.data.isCompleted; // 表示是否已经拉完所有消息。
+      //     console.log(nextReqMessageID,'nextReqMessageID2========');
+      //     if(!isCompleted){
+      //       f1(nextReqMessageID)
+      //     }
+      //   });
+      // }
+      // // eslint-disable-next-line no-unused-vars
+      // let onSdkReady2 = function(event) {
+      //
+      //   let promise = globaltim.getMessageList({conversationID: 'C2C'+senderPno.value});
+      //   promise.then(function(imResponse) {
+      //     messageList.value = [...messageList.value, ...imResponse.data.messageList]; // 消息列表。
+      //     const nextReqMessageID = imResponse.data.nextReqMessageID; // 用于续拉，分页续拉时需传入该字段。
+      //     const isCompleted = imResponse.data.isCompleted; // 表示是否已经拉完所有消息。
+      //     console.log(nextReqMessageID,'nextReqMessageID1========');
+      //     if(!isCompleted){
+      //       f1(nextReqMessageID);
+      //     }
+      //     console.log(messageList,'finalMessageList');
+      //   });
+      // };
+      // globaltim.on(TIM.EVENT.SDK_READY, onSdkReady2);
 
       // eslint-disable-next-line no-unused-vars
       // let onSdkReady2 = function(event) {
@@ -193,7 +175,10 @@ export default {
         console.log(event.data);
         // 把发送来的消息更新到仓库
         if(event.data[0]!=='') {
-          updateOtherSendToMeMsg(event.data[0])
+            console.log(event.data[0].from);
+            if(event.data[0].from === senderPno.value){
+                updateOtherSendToMeMsg(event.data[0])
+            }
         }
       };
       //监听发送来的消息

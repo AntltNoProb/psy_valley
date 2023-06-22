@@ -130,7 +130,9 @@ export default {
             console.log(event.data);
             // 把发送来的消息更新到仓库
             if(event.data[0]!=='') {
-                updateOtherSendToMeMsg(event.data[0])
+                if(event.data[0].from === supervisorUsername.value){
+                    updateOtherSendToMeMsg(event.data[0])
+                }
             }
         };
 
