@@ -139,9 +139,7 @@ export default {
               sessionStorage.setItem(event.data[0].from, JSON.stringify(message));
           }
             // sessionStorage.setItem(event.data[0].from, JSON.stringify(message));
-          console.log(JSON.parse(sessionStorage.getItem('user')).bind_username,'okok===========');
-          console.log(JSON.parse(sessionStorage.getItem('user')).username,'okok===========');
-          if(JSON.parse(sessionStorage.getItem('user')).bind_username != event.data[0].from){
+          if(JSON.parse(sessionStorage.getItem('user')).bind_username != event.data[0].from ){
                 vistorPno.value=event.data[0].from;
                 vistorName.value=event.data[0].nick;
                 dialogVisible.value=true;

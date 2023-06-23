@@ -3,6 +3,27 @@
         <el-row type="flex" justify="center" :style="{backgroundColor: 'pink'}">
             <p>{{senderName}}</p>
         </el-row>
+        <el-dialog :title="historytitle" v-model="dialogVisible">
+                    <div v-for="(itemc,indexc) in messageHistoryList" :key="indexc">
+                        <el-row gutter="10" v-if = "itemc.from === senderPno && itemc.messageBody[0].type !== 'TIMCustomElem' " type="flex" justify="start">
+                            <el-col span="4">
+                                <el-avatar shape="square" :size="50" :src="headTwoUrl"/>
+                            </el-col>
+                            <el-col span="8" >{{senderName}}</el-col>
+                            <div class="tip-left" v-if="itemc.messageBody[0].type == TIM.TYPES.MSG_TEXT">{{itemc.messageBody[0].payload.text}}</div>
+                            <div class="tip-left" v-else-if="itemc.messageBody[0].type == TIM.TYPES.MSG_AUDIO"><m-audio :src="itemc.messageBody[0].payload.url"/></div>
+                            <div class="tip-left" v-else-if="itemc.messageBody[0].type == TIM.TYPES.MSG_MERGER">
+                                <el-button size="large">{{itemc.messageBody[0].payload.title}}</el-button>
+                            </div>
+
+                        </el-row>
+                        <el-row gutter="10" v-else-if = "itemc.messageBody[0].type !== 'TIMCustomElem'" type="flex" justify="end">
+                            <div class="tip-right">{{messageContent(itemc)}}</div>
+                            <el-col span="8">{{myname}}</el-col>
+                            <el-col span="4"><el-avatar shape="square" :size="50" :src="headOneUrl" /></el-col>
+                        </el-row>
+                    </div>
+        </el-dialog>
         <div style="width:100%" :style="{height: slbHeight}">
             <el-scrollbar ref="scrollbarRef">
                 <div ref="innerRef">
@@ -12,12 +33,17 @@
                                 <el-avatar shape="square" :size="50" :src="headTwoUrl"/>
                             </el-col>
                             <el-col span="8" >{{senderName}}</el-col>
-                            <div class="tip-left">{{messageContent(itemc)}}</div>
+                            <div class="tip-left" v-if="itemc.type == TIM.TYPES.MSG_TEXT">{{messageContent(itemc)}}</div>
+                            <div class="tip-left" v-else-if="itemc.type == TIM.TYPES.MSG_AUDIO"><m-audio :src="messageContent(itemc).url" :text="messageContent(itemc).second"/></div>
+                            <div class="tip-left" v-else-if="itemc.type == TIM.TYPES.MSG_MERGER">
+                                <el-button size="large" @click="handleMerge(messageContent(itemc).messageList,messageContent(itemc).title)">{{messageContent(itemc).title}}</el-button>
+                            </div>
+                            <div class="tip-left" v-if="itemc.type == TIM.TYPES.MSG_IMAGE" >
+                                <a :href="messageContent(itemc)[0].url"><img :src="messageContent(itemc)[1].url"/></a>
+                            </div>
                         </el-row>
                         <el-row gutter="10" v-else type="flex" justify="end">
-                            <el-col span="12">
-                                <div class="tip-right">{{messageContent(itemc)}}</div>
-                            </el-col>
+                            <div class="tip-right">{{messageContent(itemc)}}</div>
                             <el-col span="8">{{myname}}</el-col>
                             <el-col span="4"><el-avatar shape="square" :size="50" :src="headOneUrl" /></el-col>
                         </el-row>
@@ -58,7 +84,8 @@ import TIM from "tim-js-sdk";
 import {quillEditor} from "vue-quill-editor/src";
 import {globaltim} from "@/main";
 import {ref} from "vue";
-import {useRoute} from "vue-router";
+import {useRoute,useRouter} from "vue-router";
+
 // import {genTestUserSig} from "@/IMdebug";
 
 const toolbarOptions = [
@@ -100,6 +127,7 @@ export default {
     },
     setup(){
       const route = useRoute();
+      const router = useRouter();
       let senderPno = ref(route.query.pno);
       let senderName = ref(route.query.name);
       console.log(senderName.value,'senderName');
@@ -158,8 +186,8 @@ export default {
 
       // let messageList=ref(localStorage.getItem('message'));
       // let updateIMStatus=(payload)=>{
-      //   imReady.value=payload;
-      // }
+      //  imReady.value=payload;
+      //}
       let updateOtherSendToMeMsg=(payload)=>{
         if(payload.payload.text != null){
           messageList.value = [...messageList.value, payload];
@@ -177,7 +205,13 @@ export default {
         if(event.data[0]!=='') {
             console.log(event.data[0].from);
             if(event.data[0].from === senderPno.value){
-                updateOtherSendToMeMsg(event.data[0])
+                if(event.data[0].type === 'TIMCustomElem'){
+                    sessionStorage.removeItem(senderPno.value)
+                    router.push('home')
+                }else {
+                    console.log(event.data[0], 'MergeList')
+                    updateOtherSendToMeMsg(event.data[0])
+                }
             }
         }
       };
@@ -193,10 +227,14 @@ export default {
     },
     data(){
       return {
+            messageHistoryList:[],
+            historytitle:'',
+
+            dialogVisible: false,
             slbHeight:'',
             clientHeight:'',
-          headOneUrl: HeadOne,
-          headTwoUrl: HeadTwo,
+            headOneUrl: HeadOne,
+            headTwoUrl: HeadTwo,
             content: '',//聊天的内容
             editorOption: {
                 modules: {
@@ -262,12 +300,18 @@ export default {
             return payload.payload.text
           }else if(payload.type === TIM.TYPES.MSG_IMAGE){
             console.log(payload.payload.imageInfoArray, 'picture===================');
-            return payload.payload.imageInfoArray[2].url;
+            return payload.payload.imageInfoArray;
           }else if(payload.type === TIM.TYPES.MSG_AUDIO){
-            return payload.payload.url;
+            return payload.payload;
           }else if(payload.type === TIM.TYPES.MSG_MERGER){
             return payload.payload;
           }
+        },
+
+        handleMerge(list,title){
+            this.messageHistoryList = list
+            this.dialogVisible = true
+            this.historytitle = title
         },
 
         updateMySendMsg(payload){
@@ -279,12 +323,6 @@ export default {
 
         sendMsg(){
             this.content = this.$refs.myLQuillEditor.quill.getText();
-            console.log(this.content);
-            let img = this.$refs.myLQuillEditor.quill.get;
-            console.log(img);
-            console.log(globaltim, 'globaltim===================');
-            console.log(this.imReady);
-
             if(this.content.trim() === ''){
                 alert('请输入聊天信息');
                 return
@@ -320,7 +358,6 @@ export default {
                 // 发送失败
                 console.warn('sendMessage error:', imError);
             });
-          // console.log(this.senderName)
         }
     }
 }
@@ -340,7 +377,7 @@ export default {
         margin: 20px;
         padding: 5px;
         width: 300px;
-        height: 60px;
+        min-height: 40px;
         border: 2px solid #f99;
         position: relative;
         background-color: #FFF;
@@ -348,6 +385,7 @@ export default {
         -webkit-border-radius: 5px;
         -moz-border-radius: 5px;
         border-radius: 5px;
+        word-wrap: break-word;
     }
 
     .tip-left:before, .tip-left:after {
@@ -373,7 +411,7 @@ export default {
         margin: 20px;
         padding: 5px;
         width: 300px;
-        height: 60px;
+        min-height: 40px;
         border: 2px solid #0ff;
         position: relative;
         background-color: #FFF;
@@ -381,6 +419,7 @@ export default {
         -webkit-border-radius: 5px;
         -moz-border-radius: 5px;
         border-radius: 5px;
+        word-wrap: break-word;
     }
 
     .tip-right:before, .tip-right:after {
