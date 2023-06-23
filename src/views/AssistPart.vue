@@ -94,7 +94,7 @@ const toolbarOptions = [
     // 链接、图片、视频-----['link', 'image', 'video']
     ['image', 'video']
 ]
-
+import request from "@/utils/request"
 export default {
     // eslint-disable-next-line vue/multi-word-component-names
     name:"assistPart",
@@ -102,7 +102,7 @@ export default {
         quillEditor
     },
     setup(){
-        const startTime = new Date();
+        const startTime = new Date().getTime();
 
         const route = useRoute();
 
@@ -156,6 +156,8 @@ export default {
             form:{
               s_username:'',
               c_username:'',
+              c_name:'',
+              s_name:'',
               duration:'',
               date:'',
             },
@@ -201,27 +203,50 @@ export default {
         this.scrollToBottom();
     },
     methods :{
-        calculateTimeDiff() {
-            const diff = Math.abs(this.endDate - this.startDate) / 1000; // 获取时间差（单位：秒）
-            const hours = Math.floor(diff / 3600);  // 计算小时数
-            const minutes = Math.floor((diff % 3600) / 60); // 计算分钟数
-            const seconds = Math.floor(diff % 60); // 计算秒数
-            // 格式化时间差为 hh:mm:ss
-            this.timeDiff = `${this.padZero(hours)}:${this.padZero(minutes)}:${this.padZero(seconds)}`
-            this.form.duration = this.timeDiff
-            this.form.date = this.startTime
-            this.form.c_username = JSON.parse(sessionStorage.getItem("user")).username
-            this.form.s_username = this.supervisorUsername
+        timestampToTime(timestamp) {
+            var date = new Date(timestamp);//时间戳为10位需*1000，时间戳为13位的话不需乘1000
+            var Y = date.getFullYear() + '-';
+            var M = (date.getMonth()+1 < 10 ? '0'+(date.getMonth()+1):date.getMonth()+1) + '-';
+            var D = (date.getDate()< 10 ? '0'+date.getDate():date.getDate())+ ' ';
+            var h = (date.getHours() < 10 ? '0'+date.getHours():date.getHours())+ ':';
+            var m = (date.getMinutes() < 10 ? '0'+date.getMinutes():date.getMinutes()) + ':';
+            var s = date.getSeconds() < 10 ? '0'+date.getSeconds():date.getSeconds();
+            return Y+M+D+h+m+s;
         },
+        times(data) {//秒转hh-mm-ss
+            var time = Number(data);
+            var h = Math.floor(time / 3600);
+            var m = Math.floor((time % 3600) / 60);
+            var s = parseInt(time % 3600) % 60;
+            var hh = h < 10 ? "0" + h : h;
+            var mm = m < 10 ? "0" + m : m;
+            var ss = s < 10 ? "0" + s : s;
+            return hh + ":" + mm + ":" + ss;
+        },
+
+        calculateTimeDiff() {
+            // 格式化时间差为 hh:mm:ss
+            this.timeDiff = (this.endTime - this.startTime)/1000
+            this.form.duration = this.times(this.timeDiff)
+            this.form.date = this.timestampToTime(this.startTime)
+            this.form.c_username = JSON.parse(sessionStorage.getItem("user")).username
+            this.form.c_name =JSON.parse(sessionStorage.getItem("user")).name
+            this.form.s_username = this.supervisorUsername
+            this.form.s_name = this.supervisorName
+        },
+
         padZero(num) {
             return String(num).padStart(2, '0'); // 补零，确保两位数格式
         },
-        endAssist(){
-            this.endTime = new Date();
-            this.calculateTimeDiff();
-            console.log(this.timeDiff);
 
-            //request.post('assist/insert',this.form)
+        endAssist(){
+            this.endTime = new Date().getTime();
+            this.calculateTimeDiff();
+            console.log(this.timeDiff, 'HHHHHHH')
+            console.log(this.form, 'Wangwenhai')
+            request.post('assist/insert',this.form).then(res=>{
+                console.log(res, "kokomi")
+            })
 
             let message = globaltim.createTextMessage({
                 to: this.supervisorUsername,
