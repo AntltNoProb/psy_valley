@@ -165,9 +165,9 @@ export default {
                   supervisorName.value=[];
                   supervisorUsername.value=[];
                   currentSupervisor.value=res.data.total;
-                  for (tmp of res.data.consultants){
-                    supervisorUsername.value=[...supervisorUsername.value, tmp.bind_username];
-                    supervisorName.value=[...supervisorName.value, tmp.bind_name];
+                  for (tmp of res.data.supervisors){
+                    supervisorUsername.value=[...supervisorUsername.value, tmp.username];
+                    supervisorName.value=[...supervisorName.value, tmp.name];
                   }
                   console.log(supervisorName,'supervisorName');
                   console.log(supervisorUsername,'supervisorPnos');
