@@ -15,6 +15,10 @@
             <el-icon><icon-menu /></el-icon>
             <span>排班管理</span>
         </el-menu-item>
+        <el-menu-item index="/dialog-record">
+            <el-icon><icon-menu /></el-icon>
+            <span>求助记录</span>
+        </el-menu-item>
         <el-menu-item index="/consult-record">
             <el-icon><icon-menu /></el-icon>
             <span>咨询记录</span>

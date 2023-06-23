@@ -124,12 +124,12 @@ export default {
 
       let onMessageReceived1 = function(event) {
         // event.data - 存储 Message 对象的数组 - [Message]
-        console.log(event.data);
+          console.log(event.data[0],"pic");
         // 把发送来的消息更新到仓库
         if(event.data[0].from !== supervisorName.value[0]) {
-          globaltim.off(TIM.EVENT.MESSAGE_RECEIVED, onMessageReceived1);
+          //globaltim.off(TIM.EVENT.MESSAGE_RECEIVED, onMessageReceived1);
 
-          if(sessionStorage.getItem(event.data[0].from) != null){
+            if(sessionStorage.getItem(event.data[0].from) != null){
               let tmp = JSON.parse(sessionStorage.getItem(event.data[0].from))
               console.log(tmp, 'tmp');
               let message = [...tmp, event.data[0]];
@@ -138,9 +138,9 @@ export default {
               let message = [event.data[0]];
               sessionStorage.setItem(event.data[0].from, JSON.stringify(message));
           }
-            // sessionStorage.setItem(event.data[0].from, JSON.stringify(message));
-          if(JSON.parse(sessionStorage.getItem('user')).bind_username != event.data[0].from ){
-                vistorPno.value=event.data[0].from;
+
+          if(JSON.parse(sessionStorage.getItem('user')).bind_username !== event.data[0].from ){
+              vistorPno.value=event.data[0].from;
                 vistorName.value=event.data[0].nick;
                 dialogVisible.value=true;
           }

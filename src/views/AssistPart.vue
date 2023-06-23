@@ -342,7 +342,7 @@ export default {
     height: 200px;
 }
 </style>
-<style>
+<style scoped>
 body {
     margin: 0;
     padding: 0;
