@@ -2,8 +2,8 @@
     <el-dialog v-model="dialogVisible" title="添加排班">
         <el-text type="info">
             为 {{ selectDate.getFullYear() }} 年 {{ selectDate.getMonth() + 1 }} 月
-            {{ selectDate.getDate() }} 日
-            (星期{{ '日一二三四五六'.charAt(selectDate.getDay()) }})
+            {{ selectDate.getDate() }} 日 {{ scheduleAllWeek ? '及之后的' : '' }}
+            星期{{ '日一二三四五六'.charAt(selectDate.getDay()) }}
             添加{{ scheduleTypeLoc }}排班
         </el-text>
         <el-form class="select-form" ref="addForm">
@@ -24,9 +24,9 @@
             </span>
         </template>
     </el-dialog>
-    <el-container class="calendar-container" style="margin: 20px">
+    <el-container class="calendar-container" style="margin: 20px; margin-right:0px">
 
-        <el-col :span="18">
+        <el-col :span="18" v-loading="isLoadingCal">
             <FullCalendar ref="calendar" class="calendar" :options="calendarOptions">
                 <template #dayCellContent="arg">
                     <div style="width:100%; text-align: end;">{{ arg.dayNumberText }}</div>
@@ -37,10 +37,17 @@
         </el-col>
 
         <el-col :span="6">
-            <el-card class="calendar-panel" shadow="hover">
+            <el-card class="calendar-panel" shadow="hover" v-loading="isLoadingCard">
                 <template #header>
                     <div class="card-header">
-                        <div>{{ timeStr }}</div>
+                        <el-row>
+                            <el-col :span="10">{{ timeStr }}</el-col>
+                            <el-col :span="14" style="text-align: end;">
+                                <el-switch v-model="scheduleAllWeek" size="small"
+                                    style="--el-switch-on-color: var(--el-border-color); --el-switch-off-color: var(--el-color-primary);"
+                                    inactive-text="仅添加单日排班" />
+                            </el-col>
+                        </el-row>
                         <el-radio-group v-model="scheduleType">
                             <el-radio-button label="counselor">咨询师</el-radio-button>
                             <el-radio-button label="supervisor">督导</el-radio-button>
@@ -51,14 +58,10 @@
                     <el-table-column prop="w_name" />
                     <el-table-column align="right">
                         <template #default="scope">
-                            <el-popconfirm title="确定要取消此排班吗?" confirm-button-text="确定" cancel-button-text="取消">
+                            <el-popconfirm title="确定要取消此排班吗?" confirm-button-text="确定" cancel-button-text="取消"
+                                @confirm="onRemove(scope.$index, scope.row)">
                                 <template #reference>
-                                    <el-button 
-                                        size="small" 
-                                        type="danger" 
-                                        @click="onRemove(scope.$index, scope.row)"
-                                        :disabled="getButtonDisabled()"
-                                    >
+                                    <el-button size="small" type="danger" :disabled="getButtonDisabled()">
                                         取消排班
                                     </el-button>
                                 </template>
@@ -84,6 +87,7 @@ import request from '@/utils/request'
 import { ElMessage } from 'element-plus'
 export default {
     name: 'work-schedule',
+    inject: ['reload'],
     components: {
         FullCalendar,
     },
@@ -124,12 +128,16 @@ export default {
                 }
             },
             scheduleType: "counselor",
+            viewMonth: new Date(),
             selectDate: new Date(),
             selectDateData: {},
             scheduleData: [],
             dialogVisible: false,
             newSchedule: '',
             availableSchedule: [],
+            scheduleAllWeek: true,
+            isLoadingCard: false,
+            isLoadingCal: false,
         }
     },
     methods: {
@@ -140,6 +148,7 @@ export default {
                 this.onMonthChange(info.start.getFullYear(), info.start.getMonth());
             }
             this.selectDate = info.start;
+            this.viewMonth = this.selectDate;
             this.generateDataCache();
         },
         onMonthChange(year, month) {
@@ -153,11 +162,12 @@ export default {
 
             let stemp = this.scheduleType[0].toUpperCase() + this.scheduleType.slice(1);
             const url = 'arrange/delete' + stemp;
+            this.isLoadingCard = true;
             request({
                 url: url,
                 method: 'post',
                 params: {
-                    date: this.generateDateStr(),
+                    date: this.getDateStrOf(this.selectDate),
                 },
                 data: this.selectDateData[this.scheduleType][index],
             }).then(res => {
@@ -166,76 +176,87 @@ export default {
                         type: 'success',
                         message: '取消排班成功',
                     });
-                    this.moveToDate(this.selectDate)
-                    // this.loadMonthData(this.selectDate);
+                    this.loadMonthData(this.selectDate, () => {
+                        this.moveToDate(this.selectDate);
+                        this.generateDataCache();
+                    }, ()=> {
+                        this.isLoadingCard = false;
+                    });
                 } else {
                     ElMessage({
                         type: 'success',
                         message: '取消排班失败, 服务器返回: ' + res.message,
                     });
+                    this.isLoadingCard = false;
                 }
             }).catch(err => {
                 ElMessage({
                     type: 'error',
-                    message: '取消排班失败:' + err,
+                    message: '取消排班出错:' + err,
                 });
+                this.isLoadingCard = false;
             });
         },
         onFormAdd(data) {
             data.sort((a, b) => a - b);
             this.hideAddWindow();
-            const postData = data.map(i => this.availableSchedule[i]);
-
             let stemp = this.scheduleType[0].toUpperCase() + this.scheduleType.slice(1);
             const url = 'arrange/insert' + stemp;
-            request({
-                url: url,
-                method: 'post',
-                params: {
-                    date: this.generateDateStr(),
-                },
-                data: postData,
+
+            this.isLoadingCard = true;
+
+            request.post(url, {
+                dates: this.getDateStrArr(),
+                workers: data.map(i => this.availableSchedule[i]),
             }).then(res => {
                 if (res.code == '1') {
                     ElMessage({
                         type: 'success',
                         message: '添加成功',
                     });
-                    this.loadMonthData(this.selectDate);
+                    this.loadMonthData(this.selectDate, () => {
+                        this.moveToDate(this.selectDate);
+                        this.generateDataCache();
+                    }, ()=> {
+                        this.isLoadingCard = false;
+                    });
+
                 } else {
                     ElMessage({
                         type: 'success',
                         message: '添加失败, 服务器返回: ' + res.message,
                     });
+                    this.isLoadingCard = false;
                 }
+                
             }).catch(err => {
                 ElMessage({
                     type: 'error',
                     message: '添加失败:' + err,
                 });
+                this.isLoadingCard = false;
             });
         },
         moveToToday() {
             let capi = this.$refs.calendar.getApi();
-            capi.select(new Date());
             capi.today();
+            capi.select(new Date());
         },
         moveToDate(date) {
             let capi = this.$refs.calendar.getApi();
-            capi.select(date);
             capi.gotoDate(date);
+            capi.select(date);
         },
         moveMonth(isPrev) {
             let capi = this.$refs.calendar.getApi();
-            let viewMonth = new Date();
             if (isPrev) {
                 capi.prev();
-                viewMonth.setMonth(this.selectDate.getMonth() - 1);
+                this.viewMonth.setMonth(this.viewMonth.getMonth() - 1);
             } else {
                 capi.next();
-                viewMonth.setMonth(this.selectDate.getMonth() + 1);
+                this.viewMonth.setMonth(this.viewMonth.getMonth() + 1);
             }
-            this.loadMonthData(viewMonth);
+            this.loadMonthData(this.viewMonth);
         },
         getCurrentList() {
             if (this.selectDateData == null) {
@@ -249,8 +270,10 @@ export default {
             }
             return 0;
         },
-        loadMonthData(date) {
+        loadMonthData(date, after, must) {
             const url = 'arrange/list';
+            ElMessage(date.toDateString());
+            this.isLoadingCal = true;
             request.get(url, {
                 params: {
                     year: date.getFullYear(),
@@ -259,17 +282,29 @@ export default {
             }).then(res => {
                 if (res.code == '1') {
                     this.scheduleData = res.data.arrangeData;
+                    console.log(this.scheduleData);
+                    if (after != null) {
+                        after();
+                    }
                 } else {
                     ElMessage({
                         type: 'error',
-                        message: '抓取信息失败: '+res.message,
+                        message: '抓取信息失败: ' + res.message,
                     });
+                }
+                this.isLoadingCal = false;
+                if (must != null) {
+                    must();
                 }
             }).catch(err => {
                 ElMessage({
                     type: 'error',
-                    message: '抓取信息错误: '+err,
+                    message: '抓取信息错误: ' + err,
                 });
+                this.isLoadingCal = false;
+                if (must != null) {
+                    must();
+                }
             });
         },
         showAddWindow() {
@@ -285,7 +320,7 @@ export default {
             const url = 'arrange/available' + stemp;
             request.get(url, {
                 params: {
-                    date: this.generateDateStr(),
+                    date: this.getDateStrOf(this.selectDate),
                 },
             }).then(res => {
                 if (res.code == '1') {
@@ -293,13 +328,13 @@ export default {
                 } else {
                     ElMessage({
                         type: 'error',
-                        message: '查询列表失败: '+res.message,
+                        message: '查询列表失败: ' + res.message,
                     });
                 }
             }).catch(err => {
                 ElMessage({
                     type: 'error',
-                    message: '查询列表出错: '+err,
+                    message: '查询列表出错: ' + err,
                 })
             });
         },
@@ -315,10 +350,31 @@ export default {
             }
             this.selectDateData = this.scheduleData[index];
         },
-        generateDateStr() {
-            return [this.selectDate.getFullYear(),
-            this.selectDate.getMonth() + 1,
-            this.selectDate.getDate()
+        // generateDateStr() {
+        //     return [this.selectDate.getFullYear(),
+        //     this.selectDate.getMonth() + 1,
+        //     this.selectDate.getDate()
+        //     ].join('-');
+        // },
+        getDateStrArr() {
+            if (this.scheduleAllWeek) {
+                let res = [];
+                for (let date = new Date(this.selectDate);
+                    date.getMonth() == this.selectDate.getMonth();
+                    date.setDate(date.getDate() + 7)
+                ) {
+                    res.push(this.getDateStrOf(date));
+                }
+                return res;
+            }
+            return [this.getDateStrOf(this.selectDate)];
+        },
+        getDateStrOf(date) {
+            let formatFunc = ((d) => (d < 10 ? '0' + d : '' + d));
+            return [
+                date.getFullYear(),
+                formatFunc(date.getMonth() + 1),
+                formatFunc(date.getDate()),
             ].join('-');
         },
         getButtonDisabled() {
@@ -336,16 +392,19 @@ export default {
         scheduleTypeLoc() {
             return this.scheduleType == 'counselor' ? '咨询师' : '督导';
         },
-        
+
     },
     created() {
-        this.loadMonthData(this.selectDate);
+        this.loadMonthData(this.selectDate, () => {
+            this.generateDataCache();
+        });
     },
 }
 </script>
 <style>
 .calendar-panel {
     margin: 10px;
+    margin-right: 0;
 }
 
 .schedule-list-item {
