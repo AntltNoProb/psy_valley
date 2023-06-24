@@ -272,7 +272,6 @@ export default {
         },
         loadMonthData(date, after, must) {
             const url = 'arrange/list';
-            ElMessage(date.toDateString());
             this.isLoadingCal = true;
             request.get(url, {
                 params: {
