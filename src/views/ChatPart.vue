@@ -33,7 +33,7 @@
                     <div v-for="(itemc,indexc) in messageList" :key="indexc">
                         <el-row gutter="10" v-if = "itemc.flow === 'in'" type="flex" justify="start">
                             <el-col span="4" >
-                                <el-avatar shape="square" :size="50" :src="headTwoUrl"/>
+                                <el-avatar shape="square" :size="50" :src="messageAvatar(itemc)"/>
                             </el-col>
                             <el-col span="8" >{{senderName}}</el-col>
                             <div class="tip-left" v-if="itemc.type == TIM.TYPES.MSG_TEXT">{{messageContent(itemc)}}</div>
@@ -48,7 +48,7 @@
                         <el-row gutter="10" v-else type="flex" justify="end">
                             <div class="tip-right">{{messageContent(itemc)}}</div>
                             <el-col span="8">{{myname}}</el-col>
-                            <el-col span="4"><el-avatar shape="square" :size="50" :src="headOneUrl" /></el-col>
+                            <el-col span="4"><el-avatar shape="square" :size="50" :src="messageAvatar(itemc)" /></el-col>
                         </el-row>
                     </div>
                 </div>
