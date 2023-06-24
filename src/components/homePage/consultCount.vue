@@ -1,5 +1,5 @@
 <template>
-    <el-card class="consult-data" :body-style="{ height: '100%', width: '100%' }">
+    <el-card class="consult-data" :body-style="{ height: '100%', width: '100%' }" shadow="hover">
         <el-row :gutter="10" type="flex" align="middle" class="consult-row">
             <el-col :span="eachSpan" class="consult-col">
                 <el-text class="consult-card-header">今日咨询数</el-text>
@@ -83,6 +83,6 @@ export default {
 
 .consult-card-main {
     display: block;
-    font-size: 2vw;
+    font-size: 1.5rem;
 }
 </style>

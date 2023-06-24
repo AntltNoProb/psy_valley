@@ -57,6 +57,10 @@ export default {
             curCount: 0,
         }
     },
+    created() {
+        this.loadTotalCount();
+        this.loadTimeStr();
+    },
     methods: {
         loadTotalCount() {
             const url = 'records/totalCount';

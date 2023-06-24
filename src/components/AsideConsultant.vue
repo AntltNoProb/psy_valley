@@ -71,7 +71,7 @@ import TIM from "tim-js-sdk";
 import request from "@/utils/request";
 //import router from "@/router";
 // eslint-disable-next-line no-unused-vars
-//import {ElMessage} from "element-plus";
+import {ElMessage} from "element-plus";
 
 
 export default {
@@ -192,6 +192,11 @@ export default {
                     currentVisitors.value=visitorNames.value.length;
                     console.log(visitorNames,'visitorNames');
                     console.log(visitorPnos, 'visitorPnos');
+                }).catch(e=>{
+                  ElMessage({
+                    type:'error',
+                    message:e,
+                  });
                 })
 
 

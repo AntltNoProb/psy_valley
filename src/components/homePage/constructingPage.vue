@@ -1,5 +1,5 @@
 <template>
-    <el-card class="constructing">
+    <el-card class="constructing" shadow="hover">
         <el-text>CONSTRUCTING</el-text>
     </el-card>
 </template>

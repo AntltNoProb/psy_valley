@@ -1,5 +1,5 @@
 <template>
-    <el-card class="online-consultant">
+    <el-card class="online-consultant" shadow="hover">
         <el-row class="outer-row" :gutter="10" type="flex" align="middle">
             <el-col :span="18">
                 <el-text class="consult-card-header">在线咨询师</el-text>
@@ -48,6 +48,14 @@ export default {
             type: String,
             default: 'flex-start',
         },
+        userBind: {
+            type: Boolean,
+            default: false,
+        },
+        pageSize: {
+            type: Number,
+            default: 12,
+        }
     },
     data() {
         return {
@@ -55,13 +63,14 @@ export default {
             total: 0,
             curCount: 0,
             curPage: 1,
-            pageSize: 12,
-        }
+            user: {},
+        };
     },
     methods: {
         loadConsultant(page, size) {
             const url = 'counselors/onlineList';
-            request.get(url, {
+            const uurl = 'supervisors/counselorList/' + this.user.username;
+            request.get(this.userBind?uurl:url, {
                 params: {
                     pageNum: page,
                     pageSize: size,
@@ -85,6 +94,7 @@ export default {
         },
         loadCurrentCount() {
             const url = 'records/currentCount';
+
             request.get(url).then(res => {
                 if (res.code == '1') {
                     this.curCount = res.data.total;
@@ -108,6 +118,7 @@ export default {
         },
     },
     mounted() {
+        this.user = JSON.parse(sessionStorage.getItem('user'));
         this.loadConsultant(this.curPage, this.pageSize);
     }
 }

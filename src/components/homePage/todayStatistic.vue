@@ -1,5 +1,5 @@
 <template>
-    <el-card class="today-chart">
+    <el-card class="today-chart" shadow="hover">
         <div class="today-chart-container">
             <v-chart :option="todayOption" style="height:200px"></v-chart>
         </div>

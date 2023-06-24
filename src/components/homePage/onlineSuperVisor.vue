@@ -1,5 +1,5 @@
 <template>
-    <el-card class="online-supervisor">
+    <el-card class="online-supervisor" shadow="hover">
         <el-row class="outer-row" :gutter="10" type="flex" align="middle">
             <el-col :span="18">
                 <el-text class="supervise-card-header">在线督导</el-text>
