@@ -90,6 +90,7 @@ export default {
                             let timestamp=new Date().getTime();
                             console.log(JSON.stringify(timestamp), 'timestamp')
                             sessionStorage.setItem("timestamp", JSON.stringify(timestamp));
+                            sessionStorage.setItem("AssistEnd", true);
                             this.$router.push("/")
 
                         }else if(res.code === "2"){

@@ -20,6 +20,10 @@
             <el-icon><icon-menu /></el-icon>
             <span>咨询记录</span>
         </el-menu-item>
+        <el-menu-item index="/dialog-record">
+            <el-icon><icon-menu /></el-icon>
+            <span>求助记录</span>
+        </el-menu-item>
         <el-menu-item index="/userspace">
             <el-icon><setting /></el-icon>
             <template #title>账户设置</template>
@@ -44,7 +48,7 @@
                 </el-menu-item>
             </el-menu-item-group>
             <el-menu-item-group title="求助">
-                <el-menu-item  v-for="(o, inx) in currentSupervisor" :key="o" @click="$router.push({path: 'assist', query:{'username': supervisorUsername[inx], 'name': supervisorName[inx]}})">
+                <el-menu-item  v-for="(o, inx) in currentSupervisor" :key="o" @click="handleAssist(supervisorName[inx],supervisorUsername[inx])">
                     <span >{{supervisorName[inx]}}</span>
                 </el-menu-item>
             </el-menu-item-group>
@@ -177,9 +181,10 @@ export default {
                     visitorNames.value=[];
                     currentVisitors.value=conversationList.value.length;
                     visitorPnos.value=[];
+                    let SupUsername = JSON.parse(sessionStorage.getItem('user')).bind_username
                     for (item of conversationList.value){
                         console.log(item.userProfile.userID, 'item');
-                        if(item.userProfile.userID !== supervisorUsername.value[0]){
+                        if(item.userProfile.userID !== SupUsername){
                             visitorPnos.value=[...visitorPnos.value, item.userProfile.userID];
                             visitorNames.value=[...visitorNames.value, item.userProfile.nick];
                         }
@@ -227,5 +232,22 @@ export default {
         ArrowDown ,
         IconMenu,
     },
+    methods:{
+        handleAssist(name,username){
+            //console.log('res','add---------')
+            console.log(sessionStorage.getItem('AssistEnd'),'add---------')
+
+            if(JSON.parse(sessionStorage.getItem('AssistEnd')) == true){
+                console.log(sessionStorage.getItem('AssistEnd'),'add---------')
+                console.log(username,'add---------')
+                request.patch('/supervisors/addCurrent/'+ username).then(res=>{
+
+                    console.log(res,'add---------')
+                })
+                sessionStorage.setItem('AssistEnd', false)
+            }
+            this.$router.push({path: 'assist', query:{'username': username, 'name': name}})
+        }
+    }
 }
 </script>

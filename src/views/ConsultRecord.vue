@@ -10,7 +10,7 @@
                     <div class="tip-left" v-if="itemc.MsgBody[0].MsgType == 'TIMTextElem'">{{itemc.MsgBody[0].MsgContent.Text}}</div>
                     <div class="tip-left" v-else-if="itemc.MsgBody[0].MsgType == 'TIMSoundElem'"><m-audio :src="itemc.MsgBody[0].MsgContent.Url"/></div>
                     <div class="tip-left" v-else-if="itemc.MsgBody[0].MsgType == 'TIMImageElem'" >
-                        <a :href="itemc.MsgBody[0].MsgContent.ImageInfoArray[0].URL" target="_blank">查看详情</a>
+                        <a :href="itemc.MsgBody[0].MsgContent.ImageInfoArray[0].URL" target="_blank">图片点击查看详情</a>
                     </div>
                     <div class="tip-left" v-else-if="itemc.MsgBody[0].MsgType == 'TIMMergerElem'">
                         <el-button size="large">{{itemc.MsgBody[0].MsgContent.Title}}</el-button>
@@ -53,12 +53,13 @@
             <el-table-column prop="c_name" label="咨询师"/>
             <el-table-column prop="v_name" label="访客" />
             <el-table-column prop="duration" label="咨询时长" />
-            <el-table-column prop="level" label="咨询评价" sortable/>
+            <el-table-column prop="level" label="咨询评分" sortable/>
+            <el-table-column prop="evaluate" label="咨询评价" />
             <el-table-column prop="starttime" label="咨询日期"  sortable/>
             <el-table-column label="操作">
                 <template #default="scope">
                     <el-button type="primary" @click="handleDetail(scope.row.c_name, scope.row.v_name,scope.row.pno,scope.row.c_username,scope.row.duration, scope.row.starttime)">查看详情</el-button>
-                    <el-popconfirm title="确认要导出吗?" @confirm="HandleExport(scope.row.id)">
+                    <el-popconfirm title="确认要导出吗?" @confirm="handleExport(scope.row.c_name, scope.row.v_name,scope.row.pno,scope.row.c_username,scope.row.duration, scope.row.starttime)">
                         <template #reference>
                             <el-button size="small">导出</el-button>
                         </template>
@@ -83,6 +84,9 @@
 import request from "../utils/request";
 import {ElMessage} from "element-plus";
 import axios from "axios";
+import { toRaw } from '@vue/reactivity'
+import headOne from "@/assets/head/head001.png";
+import headTwo from "@/assets/head/head002.png";
 // import {IM_APP_ID} from "@/IMconfig/im";
 export default {
     name: 'consult-record',
@@ -102,6 +106,8 @@ export default {
                 endTime: '',
                 date: '',
             },
+            headOneUrl: headOne,
+            headTwoUrl: headTwo,
             totalMsg:0,
             messageList:[],
             form:{},
@@ -169,28 +175,65 @@ export default {
                     "MaxTime": this.timeToTimestamp(startime)+this.hmsToSecondsOnly(duration),
                 },
             }).then(res => {
-
                 this.totalMsg = res.data.MsgCnt
+                console.log(res,'zm')
                 this.messageList = [...res.data.MsgList].reverse()
                 console.log(this.messageList,"klee")
                 this.dialogFormVisible = true
             })
         },
         load(){
-            request.get("/records/list",{
-                params:{
-                    pageNum: this.currentPage,
-                    pageSize:10,
-                    visitorName: this.searchVisitor,
-                    counselorName: this.searchCounselor,
-                    startDate: this.param.startTime,
-                    endDate: this.param.endTime,
-                },
-            }).then(res => {
-                console.log(res)
-                this.tableData=res.data.records
-                this.total = res.data.total
-            })
+            if(JSON.parse(sessionStorage.getItem('user')).authority == "SystemManager"){
+                request.get("/records/list",{
+                    params:{
+                        pageNum: this.currentPage,
+                        pageSize:10,
+                        visitorName: this.searchVisitor,
+                        counselorName: this.searchCounselor,
+                        startDate: this.param.startTime,
+                        endDate: this.param.endTime,
+                    },
+                }).then(res => {
+                    console.log(res)
+                    this.tableData=res.data.records
+                    this.total = res.data.total
+                })
+            }else if(JSON.parse(sessionStorage.getItem('user')).authority === 'Counselor'){
+                request.get("/records/listForCounselor/" + JSON.parse(sessionStorage.getItem('user')).username,{
+                    params:{
+                        pageNum: this.currentPage,
+                        pageSize:10,
+                        visitorName: this.searchVisitor,
+                        counselorName: this.searchCounselor,
+                        startDate: this.param.startTime,
+                        endDate: this.param.endTime,
+                    },
+                }).then(res => {
+                    console.log(res)
+                    this.tableData=res.data.records
+                    this.total = res.data.total
+                })
+            }else if(JSON.parse(sessionStorage.getItem('user')).authority === 'Supervisor'){
+                request.get("/records/listForSupervisor/" + JSON.parse(sessionStorage.getItem('user')).username,{
+                    params:{
+                        pageNum: this.currentPage,
+                        pageSize:10,
+                        visitorName: this.searchVisitor,
+                        counselorName: this.searchCounselor,
+                        startDate: this.param.startTime,
+                        endDate: this.param.endTime,
+                    },
+                }).then(res => {
+                    console.log(res)
+                    this.tableData=res.data.records
+                    this.total = res.data.total
+                })
+            }else{
+                ElMessage({
+                    type: 'error',
+                    message: '失败！',
+                })
+            }
         },
         exportAll(){//等待处理
             if(!this.multipleSelection.length){
@@ -199,35 +242,96 @@ export default {
                     message: '没有选中！',
                 })
             }
+            let that = this
             this.multipleSelection.forEach(function (item){
-                this.HandleExport(item.id)
+                console.log(toRaw(item).c_name,'text===')
+                that.handleExport(toRaw(item).c_name, toRaw(item).v_name, toRaw(item).pno, toRaw(item).c_username,toRaw(item).duration, toRaw(item).starttime)
             })
         },
         handleSelectionChange(val){
-            this.multipleSelection = val.map(v => v.id)
+            console.log(val,'exp')
+            this.multipleSelection = val
         },
+        timestampToTime(timestamp) {
+            var date = new Date(timestamp*1000);//时间戳为10位需*1000，时间戳为13位的话不需乘1000
+            var Y = date.getFullYear() + '-';
+            var M = (date.getMonth()+1 < 10 ? '0'+(date.getMonth()+1):date.getMonth()+1) + '-';
+            var D = (date.getDate()< 10 ? '0'+date.getDate():date.getDate())+ ' ';
+            var h = (date.getHours() < 10 ? '0'+date.getHours():date.getHours())+ ':';
+            var m = (date.getMinutes() < 10 ? '0'+date.getMinutes():date.getMinutes()) + ':';
+            var s = date.getSeconds() < 10 ? '0'+date.getSeconds():date.getSeconds();
+            return Y+M+D+h+m+s;
+        },
+        handleExport(myname,senderName,phoneNum,username,duration,startime){
+            this.myname = myname
+            this.senderName = senderName
+            this.myID = username
+            this.senderID = phoneNum
+            axios({
+                method:'post',
+                url:'/IM',
+                params:{
+                    sdkappid: 1400813651,
+                    identifier: "administrator",
+                    usersig:"eJwtzFsLgjAcBfDvsueQTTdv0EOgXcAuUJHtbbBlf0Jdc8Qi*u6Z*nh*53A*6FQcvZcyKEW*h9FsyCBVY*EGAwtZQwOdNcK2Zhp08iG0BolSQjGOSRAyMjbKaTCqd8aYjzEe1UL9tzBmlPoJodMLVP1-UkarZbnmrr0XWe40r0luo8vBmTcE2U7z-XazeJ65qa5z9P0BWoQ1QA__",
+                    random:1,
+                    contenttype:"json",
+                },
+                data:{
+                    "Operator_Account": username,
+                    "Peer_Account" : phoneNum,
+                    "MaxCnt": 100,
+                    "MinTime": this.timeToTimestamp(startime),
+                    "MaxTime": this.timeToTimestamp(startime)+this.hmsToSecondsOnly(duration),
+                },
+            }).then(res => {
+                this.totalMsg = res.data.MsgCnt
+                console.log(res,'zm')
+                this.messageList = [...res.data.MsgList].reverse()
 
-        HandleExport(id) {//等待处理
-            request.get("records/"+id ,{
-                responseType: 'blob',//设置返回类型为文件
-            }).then((res)=>{
-                const link=document.createElement('a');
-                try {
-                    let blob = new Blob([res.data],{type: 'text/plain'});//文件的格式为txt
-                    let _fileName = res.headers['content-disposition'].split(';')[1].split('=')[1];//文件名，中文无法解析的时候会显示 _(下划线),生产环境获取不到
-                    link.style.display='none';
-                    // 兼容不同浏览器的URL对象
-                    const url = window.URL || window.webkitURL || window.moxURL;
-                    link.href=url.createObjectURL(blob);
-                    link.setAttribute('download', _fileName.substring(_fileName.lastIndexOf('_')+1));
-                    document.body.appendChild(link);
-                    link.click();
-                    document.body.removeChild(link);
-                    url.revokeObjectURL(link.href);//销毁url对象
-                }catch (e) {
-                    console.log('下载的文件出错',e)
+                console.log(this.messageList,"klee")
+
+                let ret = []
+
+                for(var cnt = 0 ; cnt < this.totalMsg; cnt++){
+                    let message = {}
+                    if(this.messageList[cnt].MsgBody[0].MsgType == 'TIMTextElem'){
+                        if(this.messageList[cnt].From_Account == this.senderID){
+                            message['name'] = this.senderName
+                            message['time'] = this.timestampToTime(this.messageList[cnt].MsgClientTime)
+                            message['content'] = this.messageList[cnt].MsgBody[0].MsgContent.Text
+                        }else{
+                            message['name'] = this.myname
+                            message['time'] = this.timestampToTime(this.messageList[cnt].MsgClientTime)
+                            message['content'] = this.messageList[cnt].MsgBody[0].MsgContent.Text
+                        }
+                    }else{
+                        if(this.messageList[cnt].From_Account == this.senderID){
+                            message['name'] = this.senderName
+                            message['time'] = this.timestampToTime(this.messageList[cnt].MsgClientTime)
+                            message['content'] = "非文本类型消息"
+                        }else{
+                            message['name'] = this.myname
+                            message['time'] = this.timestampToTime(this.messageList[cnt].MsgClientTime)
+                            message['content'] = "非文本类型消息"
+                        }
+                    }
+                    ret.push(message)
                 }
-            }).catch(()=>{
+
+                let jsonStr = JSON.stringify(ret, null, 2);
+
+                let blob = new Blob([jsonStr], {type: "text/plain"});
+
+                // 创建一个指向blob的url
+                let url = URL.createObjectURL(blob);
+
+                // 创建一个a标签，并设置href为我们刚才创建的url
+                let a = document.createElement('a');
+                a.href = url;
+                a.download = 'history.txt'; // 设置下载的文件名
+                // 模拟用户点击这个a标签，这会触发下载
+                a.click();
             })
         },
         handleCurrentChange(){
@@ -236,3 +340,76 @@ export default {
     },
 }
 </script>
+<style scoped>
+body {
+    margin: 0;
+    padding: 0;
+}
+/*左三角*/
+.tip-left {
+    margin: 20px;
+    padding: 5px;
+    min-width: 50px;
+    min-height: 40px;
+    border: 2px solid #f99;
+    position: relative;
+    background-color: #FFF;
+    /*设置圆角*/
+    -webkit-border-radius: 5px;
+    -moz-border-radius: 5px;
+    border-radius: 5px;
+    word-wrap: break-word;
+}
+
+.tip-left:before, .tip-left:after {
+    content: "";
+    display: block;
+    border-width: 15px;
+    position: absolute;
+    left: -30px;
+    top: 20px;
+    border-style: dashed solid solid dashed;
+    border-color: transparent #f99 transparent transparent;
+    font-size: 0;
+    line-height: 0;
+}
+
+.tip-left:after {
+    left: -27px;
+    border-color: transparent #FFF transparent transparent;
+}
+
+/*右三角*/
+.tip-right {
+    margin: 20px;
+    padding: 5px;
+    min-width: 50px;
+    min-height: 40px;
+    border: 2px solid #0ff;
+    position: relative;
+    background-color: #FFF;
+    /*设置圆角*/
+    -webkit-border-radius: 5px;
+    -moz-border-radius: 5px;
+    border-radius: 5px;
+    word-wrap: break-word;
+}
+
+.tip-right:before, .tip-right:after {
+    content: "";
+    display: block;
+    border-width: 15px;
+    position: absolute;
+    right: -30px;
+    top: 20px;
+    border-style: dashed solid solid dashed;
+    border-color: transparent transparent transparent #0ff;
+    font-size: 0;
+    line-height: 0;
+}
+
+.tip-right:after {
+    right: -27px;
+    border-color: transparent transparent transparent #FFF;
+}
+</style>

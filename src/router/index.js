@@ -43,7 +43,7 @@ const routes = [
                 name: 'assist',
                 component: () => import('@/views/AssistPart.vue'),
                 meta: {
-                    roles: ['Consultant', 'Supervisor']
+                    roles: ['Consultant']
                 },
             },
             {
@@ -59,7 +59,7 @@ const routes = [
                 name: 'dialog-record',
                 component: () => import('@/views/DialogRecord.vue'),
                 meta: {
-                    roles: ['admin', 'Supervisors']
+                    roles: ['admin', 'Supervisors','Consultant']
                 },
             },
             {
