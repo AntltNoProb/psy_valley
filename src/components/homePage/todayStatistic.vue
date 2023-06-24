@@ -6,6 +6,8 @@
     </el-card>
 </template>
 <script>
+import request from '@/utils/request';
+import { ElMessage } from 'element-plus';
 export default {
     data() {
         return {
@@ -13,10 +15,15 @@ export default {
                 title: {
                     text: '今日咨询数',
                     x: 'center',
-                    padding: [10,0,0,0],
+                    padding: [10, 0, 0, 0],
                 },
                 xAxis: {
-                    data: ['1', '2', '2', '2', '2'],
+                    type: 'category',
+                    data: [],
+                    axisTick: {
+                        alignWithLabel: true
+                    },
+                    boundaryGap: false,
                 },
                 yAxis: {
 
@@ -28,11 +35,22 @@ export default {
                     bottom: '2%',
                     containLabel: true,
                 },
+                tooltip: {
+                    show: true,
+                    trigger: 'item',
+                },
                 series: [
                     {
-                        name: 'd',
+                        name: 'today',
                         type: 'line',
-                        data: [23, 1, 12, 3, 5],
+                        tooltip: {
+                            formatter: '{c}',
+                        },
+                        data: [
+                            0,0,0,0,0,0,
+                            0,0,0,0,0,0,
+                            0,0,0,0,0,0,
+                            0,0,0,0,0,0,0],
                         smooth: true,
                         areaStyle: {
                             color: {
@@ -51,8 +69,71 @@ export default {
                     },
                 ],
             },
+            everyHourCount: [],
         }
     },
+    methods: {
+        loadTodayStatic() {
+            this.todayOption.xAxis.data = this.getTodayHour();
+            const url = 'records/everyHourCount';
+            request.get(url).then(res => {
+                if (res.code == '1') {
+                    this.everyHourCount = res.data.everyHourCount;
+                    this.parseHourData();
+                } else {
+                    ElMessage({
+                        type: 'error',
+                        message: '今日统计数据获取失败: ' + res.message,
+                    });
+                }
+
+            }).catch(err => {
+                ElMessage({
+                    type: 'error',
+                    message: '今日统计数据获取错误: ' + err,
+                });
+
+            });
+        },
+        parseHourData() {
+            let dst = this.getTodayHourOnly();
+            let sei = [
+                0,0,0,0,0,0,0,0,
+                0,0,0,0,0,0,0,0,
+                0,0,0,0,0,0,0,0,0
+            ];
+
+            this.everyHourCount.forEach((o) => {
+                let i = dst.indexOf(o.everyTime);
+                if (i != -1) {
+                    sei[i] = o.everyCount;
+                }
+            });
+            this.todayOption.series[0].data = sei;
+
+        },
+        getTodayHour() {
+            let res = [];
+            for (let i=0; i<=24;i++) {
+                res.push(this.dateNumFormat(i) + ':00');
+            }
+            return res;
+        },
+        getTodayHourOnly() {
+            let res = [];
+            for (let i=0; i< 24;i++) {
+                res.push(this.dateNumFormat(i));
+            }
+            return res;
+        },
+        dateNumFormat(d) {
+            return d < 10 ? '0' + d : '' + d;
+        },
+    },
+    mounted() {
+        this.loadTodayStatic();
+        console.log(this.todayOption);
+    }
 }
 </script>
 <style>
