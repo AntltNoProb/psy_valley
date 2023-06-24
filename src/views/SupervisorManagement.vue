@@ -71,6 +71,16 @@
                 </template>
             </el-dialog>
 
+            <el-dialog v-model="dialogVisibleSchedule" title="编辑排班" width="50%" align-center @close="resetForm()">
+                <dialogSchedule ref="sche" :user="editUser"></dialogSchedule>
+                <template #footer>
+                    <span class="dialog-footer">
+                        <el-button @click="dialogVisibleSchedule = false; resetForm()">取消</el-button>
+                        <el-button type="primary" @click="saveSchedule($refs.sche.toRaw())">确定</el-button>
+                    </span>
+                </template>
+            </el-dialog>
+
         </div>
 
 
@@ -116,6 +126,7 @@
 <script>
 import request from "../utils/request";
 import {ElMessage} from "element-plus";
+import dialogSchedule from "@/components/dialogSchedule.vue";
 
 import {
     Lock,
@@ -126,17 +137,20 @@ export default {
     name: 'supervisor-management',
     components: {
         Lock,
+        dialogSchedule,
     },
     data() {
         return {
             form:{},
             dialogVisibleCreate: false,
             dialogVisibleUpdate: false,
+            dialogVisibleSchedule: false,
             search: '',
             currentPage: 1,
             total: 10 ,
             tableData: [],
-            pageSize: 10
+            pageSize: 10,
+            editUser: {},
         }
     },
     created(){
@@ -166,9 +180,12 @@ export default {
         createSupervisor(){
             this.dialogVisibleCreate = true
         },
-        handleEditInformation( row ){
-            this.dialogVisibleUpdate = true
-            this.form = row
+        handleEditSchedule(row) {
+            this.editUser = row;
+            this.dialogVisibleSchedule = true;
+            if (this.$refs.sche) {
+                this.$refs.sche.loadRow();
+            }
         },
         saveCreate(){
             request.post("/supervisors/insert",this.form).then(res => {
@@ -189,7 +206,37 @@ export default {
             this.dialogVisibleCreate = false
 
         },
+        saveSchedule(raw) {
+            const url = 'arrange/updateArrange';
 
+            request.post(url, {
+                workers: [{
+                    w_username: this.editUser.username,
+                    w_name: this.editUser.name,
+                },],
+                dates: raw,
+            }).then(res => {
+                if (res.code == '1') {
+                    ElMessage({
+                        type: 'success',
+                        message: '修改排班成功',
+                    });
+
+                } else {
+                    ElMessage({
+                        type: 'success',
+                        message: '修改排班失败, 服务器返回: ' + res.message,
+                    });
+                }
+
+            }).catch(err => {
+                ElMessage({
+                    type: 'error',
+                    message: '修改排班出错:' + err,
+                });
+            });
+            this.dialogVisibleSchedule = false;
+        },
         saveUpdate(){
             request.patch("/supervisors/update",this.form).then(res => {
                 console.log(res)
