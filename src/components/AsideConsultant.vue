@@ -33,7 +33,7 @@
                 <el-icon><IconMenu /></el-icon>
                 <span>会话管理</span>
             </template>
-            <el-dialog title="通知" v-model="dialogVisible">
+            <el-dialog title="通知" v-model="dialogVisible" @keyup.enter="this.$router.push({path:'chat',query:{'pno': vistorPno, 'name': vistorName}});dialogVisible = false">
                 <el-text>有新的消息</el-text>
                 <template #footer>
                       <span class="dialog-footer">
@@ -90,7 +90,7 @@ export default {
         // TIM登录
         let userinfo = sessionStorage.getItem("user")
         let userID = JSON.parse(userinfo).username;
-        console.log(userID);
+
         let userSig = genTestUserSig(userID).userSig; //签名信息
 
         let promise1 = globaltim.login({userID: userID, userSig: userSig});
@@ -239,14 +239,11 @@ export default {
     },
     methods:{
         handleAssist(name,username){
-            //console.log('res','add---------')
-            console.log(sessionStorage.getItem('AssistEnd'),'add---------')
 
             if(JSON.parse(sessionStorage.getItem('AssistEnd')) == true){
                 console.log(sessionStorage.getItem('AssistEnd'),'add---------')
                 console.log(username,'add---------')
                 request.patch('/supervisors/addCurrent/'+ username).then(res=>{
-
                     console.log(res,'add---------')
                 })
                 sessionStorage.setItem('AssistEnd', false)

@@ -29,13 +29,13 @@
             <el-icon><setting /></el-icon>
             <template #title>账户设置</template>
         </el-menu-item>
-        <el-dialog title="通知" v-model="dialogVisible">
+        <el-dialog title="通知" v-model="dialogVisible" @keyup.enter="this.$router.push({path:'solve',query:{'name': counselorname, 'username':counselorusername}});dialogVisible = false">
             <el-text>有新的消息</el-text>
             <template #footer>
                       <span class="dialog-footer">
                           <el-button type="danger" size="default" @click="dialogVisible = false">取消</el-button>
                           <el-button type="primary" size="default"
-                                     @click="this.$router.push({path:'solve',query:{'name': counselorname, 'username':counselorusername}});dialogVisible = false">确定</el-button>
+                            @click="this.$router.push({path:'solve',query:{'name': counselorname, 'username':counselorusername}});dialogVisible = false">确定</el-button>
                       </span>
             </template>
         </el-dialog>
@@ -132,10 +132,18 @@ export default {
         console.log(event.data);
         // 把发送来的消息更新到仓库
         globaltim.off(TIM.EVENT.MESSAGE_RECEIVED, onMessageReceived);
-        let message = [event.data[0]];
-        console.log(message,'message=======');
-        console.log(event.data[0].from,'from=======');
-        sessionStorage.setItem(event.data[0].from, JSON.stringify(message));
+        // let message = [event.data[0]];
+        // sessionStorage.setItem(event.data[0].from, JSON.stringify(message));
+
+        if(sessionStorage.getItem(event.data[0].from) != null){
+            let tmp = JSON.parse(sessionStorage.getItem(event.data[0].from));
+            tmp = [...tmp, event.data[0]]
+            sessionStorage.setItem(event.data[0].from, JSON.stringify(tmp));
+        }else {
+            let message = [event.data[0]];
+            sessionStorage.setItem(event.data[0].from, JSON.stringify(message));
+        }
+
         console.log(sessionStorage.getItem(event.data[0].from),'assistSession===');
         if(event.data[0].payload.text != 'TERMINATE'){
             dialogVisible.value=true;
