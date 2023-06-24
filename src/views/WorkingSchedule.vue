@@ -44,6 +44,7 @@
                             <el-col :span="10">{{ timeStr }}</el-col>
                             <el-col :span="14" style="text-align: end;">
                                 <el-switch v-model="scheduleAllWeek" size="small"
+                                    :disabled="getButtonDisabled()"
                                     style="--el-switch-on-color: var(--el-border-color); --el-switch-off-color: var(--el-color-primary);"
                                     inactive-text="仅添加单日排班" />
                             </el-col>
