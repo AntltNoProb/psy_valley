@@ -159,7 +159,7 @@ export default {
               c_name:'',
               s_name:'',
               duration:'',
-              date:'',
+              startDate:'',
             },
             slbHeight:'',
             clientHeight:'',
@@ -228,15 +228,11 @@ export default {
             // 格式化时间差为 hh:mm:ss
             this.timeDiff = (this.endTime - this.startTime)/1000
             this.form.duration = this.times(this.timeDiff)
-            this.form.date = this.timestampToTime(this.startTime)
+            this.form.startDate = this.timestampToTime(this.startTime)
             this.form.c_username = JSON.parse(sessionStorage.getItem("user")).username
             this.form.c_name =JSON.parse(sessionStorage.getItem("user")).name
             this.form.s_username = this.supervisorUsername
             this.form.s_name = this.supervisorName
-        },
-
-        padZero(num) {
-            return String(num).padStart(2, '0'); // 补零，确保两位数格式
         },
 
         endAssist(){
