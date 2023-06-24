@@ -20,18 +20,6 @@
             <el-icon><icon-menu /></el-icon>
             <span>咨询记录</span>
         </el-menu-item>
-        <el-menu-item index="/dialog-record">
-            <el-icon><icon-menu /></el-icon>
-            <span>求助记录</span>
-        </el-menu-item>
-        <el-menu-item index="/counselor-management">
-            <el-icon><icon-menu /></el-icon>
-            <span>咨询师管理</span>
-        </el-menu-item>
-        <el-menu-item index="/visitor-management">
-            <el-icon><icon-menu /></el-icon>
-            <span>访客管理</span>
-        </el-menu-item>
         <el-menu-item index="/userspace">
             <el-icon><setting /></el-icon>
             <template #title>账户设置</template>

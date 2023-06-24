@@ -15,6 +15,9 @@
                             <div class="tip-left" v-else-if="itemc.messageBody[0].type == TIM.TYPES.MSG_MERGER">
                                 <el-button size="large">{{itemc.messageBody[0].payload.title}}</el-button>
                             </div>
+                            <div class="tip-left" v-else-if ="itemc.type == TIM.TYPES.MSG_IMAGE" >
+                                <a :href="messageContent(itemc)[0].url" target="_blank"><img :src="messageContent(itemc)[1].url"/></a>
+                            </div>
 
                         </el-row>
                         <el-row gutter="10" v-else-if = "itemc.messageBody[0].type !== 'TIMCustomElem'" type="flex" justify="end">
@@ -39,7 +42,7 @@
                                 <el-button size="large" @click="handleMerge(messageContent(itemc).messageList,messageContent(itemc).title)">{{messageContent(itemc).title}}</el-button>
                             </div>
                             <div class="tip-left" v-if="itemc.type == TIM.TYPES.MSG_IMAGE" >
-                                <a :href="messageContent(itemc)[0].url"><img :src="messageContent(itemc)[1].url"/></a>
+                                <a :href="messageContent(itemc)[0].url" target="_blank"><img :src="messageContent(itemc)[1].url"/></a>
                             </div>
                         </el-row>
                         <el-row gutter="10" v-else type="flex" justify="end">
@@ -84,7 +87,8 @@ import TIM from "tim-js-sdk";
 import {quillEditor} from "vue-quill-editor/src";
 import {globaltim} from "@/main";
 import {ref} from "vue";
-import {useRoute,useRouter} from "vue-router";
+import {useRoute} from "vue-router";
+import {useRouter} from "vue-router";
 
 // import {genTestUserSig} from "@/IMdebug";
 
@@ -141,55 +145,8 @@ export default {
         messageList.value=[];
       }
 
-      // function f1(nextReqMessageID){
-      //   let promise = globaltim.getMessageList({conversationID: 'C2C'+senderPno.value, nextReqMessageID});
-      //   promise.then(function(imResponse) {
-      //     messageList.value = [...messageList.value, ...imResponse.data.messageList]; // 消息列表。
-      //     const nextReqMessageID = imResponse.data.nextReqMessageID; // 用于续拉，分页续拉时需传入该字段。
-      //     const isCompleted = imResponse.data.isCompleted; // 表示是否已经拉完所有消息。
-      //     console.log(nextReqMessageID,'nextReqMessageID2========');
-      //     if(!isCompleted){
-      //       f1(nextReqMessageID)
-      //     }
-      //   });
-      // }
-      // // eslint-disable-next-line no-unused-vars
-      // let onSdkReady2 = function(event) {
-      //
-      //   let promise = globaltim.getMessageList({conversationID: 'C2C'+senderPno.value});
-      //   promise.then(function(imResponse) {
-      //     messageList.value = [...messageList.value, ...imResponse.data.messageList]; // 消息列表。
-      //     const nextReqMessageID = imResponse.data.nextReqMessageID; // 用于续拉，分页续拉时需传入该字段。
-      //     const isCompleted = imResponse.data.isCompleted; // 表示是否已经拉完所有消息。
-      //     console.log(nextReqMessageID,'nextReqMessageID1========');
-      //     if(!isCompleted){
-      //       f1(nextReqMessageID);
-      //     }
-      //     console.log(messageList,'finalMessageList');
-      //   });
-      // };
-      // globaltim.on(TIM.EVENT.SDK_READY, onSdkReady2);
-
-      // eslint-disable-next-line no-unused-vars
-      // let onSdkReady2 = function(event) {
-      //   let timestamp = JSON.parse(sessionStorage.getItem("timestamp"));
-      //   console.log('C2C'+senderPno.value, 'conversationID====');
-      //   console.log(timestamp, 'timestamp=====');
-      //   let promise = globaltim.getMessageListHopping({conversationID: 'C2C'+senderPno.value, time: timestamp, direction: 1});
-      //   promise.then(function(imResponse) {
-      //     messageList.value = imResponse.data.messageList; // 消息列表。
-      //     console.log(messageList, 'messageList');
-      //   });
-      // };
-      // globaltim.on(TIM.EVENT.SDK_READY, onSdkReady2);
-
-
-      // let messageList=ref(localStorage.getItem('message'));
-      // let updateIMStatus=(payload)=>{
-      //  imReady.value=payload;
-      //}
       let updateOtherSendToMeMsg=(payload)=>{
-        if(payload.payload.text != null){
+        if(payload.payload != null){
           messageList.value = [...messageList.value, payload];
           let messageListJson = JSON.stringify(this.messageList);
           sessionStorage.setItem(senderPno.value, messageListJson);
@@ -199,17 +156,19 @@ export default {
 
       // TIM监听接收消息
       let onMessageReceived = function(event) {
-        // event.data - 存储 Message 对象的数组 - [Message]
-        console.log(event.data);
+        // event.data - 存储 Message 对象的数组 - [Message];
+          console.log('0000000',"pic=========================");
+
         // 把发送来的消息更新到仓库
         if(event.data[0]!=='') {
             console.log(event.data[0].from);
             if(event.data[0].from === senderPno.value){
-                if(event.data[0].type === 'TIMCustomElem'){
+
+                if(event.data[0].type == "TIMCustomElem"){
                     sessionStorage.removeItem(senderPno.value)
                     router.push('home')
                 }else {
-                    console.log(event.data[0], 'MergeList')
+                    console.log(event.data[0], 'NewMsg')
                     updateOtherSendToMeMsg(event.data[0])
                 }
             }
@@ -367,7 +326,7 @@ export default {
     height: 200px;
 }
 </style>
-<style>
+<style scoped>
     body {
         margin: 0;
         padding: 0;
@@ -376,7 +335,7 @@ export default {
     .tip-left {
         margin: 20px;
         padding: 5px;
-        width: 300px;
+        min-width: 50px;
         min-height: 40px;
         border: 2px solid #f99;
         position: relative;
@@ -410,7 +369,7 @@ export default {
     .tip-right {
         margin: 20px;
         padding: 5px;
-        width: 300px;
+        min-width: 50px;
         min-height: 40px;
         border: 2px solid #0ff;
         position: relative;
