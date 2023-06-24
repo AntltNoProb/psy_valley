@@ -59,8 +59,27 @@
 <script>
 // import request from "../utils/request";
 import { ElMessage } from "element-plus";
-import Head001 from "@/assets/head/head001.png"
+// import Head001 from "@/assets/head/head001.png"
+import {globaltim} from "@/main";
+import {ref} from "vue";
 export default {
+    setup(){
+      console.log("进入这段=====");
+      let avatarUrl = ref();
+      function myAvatar(){
+        let promise = globaltim.getMyProfile();
+        promise.then(function(imResponse) {
+          console.log(imResponse.data, 'avatar======='); // 个人资料 - Profile 实例
+          avatarUrl.value = imResponse.data.avatar;
+        }).catch(function(imError) {
+          console.warn('getMyProfile error:', imError); // 获取个人资料失败的相关信息
+        });
+      }
+      setTimeout(myAvatar, 800);
+      return{
+        avatarUrl
+      }
+    },
     props: {
         detail: {
             type: Boolean,
@@ -74,10 +93,10 @@ export default {
             type: Number,
             default: 0,
         },
-        avatarUrl: {
-            type: String,
-            default: Head001,
-        }
+        // avatarUrl: {
+        //     type: String,
+        //     default: Head001,
+        // }
     },
     data() {
         return {

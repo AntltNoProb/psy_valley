@@ -7,7 +7,7 @@
                     <div v-for="(itemc,indexc) in messageHistoryList" :key="indexc">
                         <el-row gutter="10" v-if = "itemc.from === senderPno && itemc.messageBody[0].type !== 'TIMCustomElem' " type="flex" justify="start">
                             <el-col span="4">
-                                <el-avatar shape="square" :size="50" :src="headTwoUrl"/>
+                                <el-avatar shape="square" :size="50" :src="messageAvatar(itemc)"/>
                             </el-col>
                             <el-col span="8" >{{senderName}}</el-col>
                             <div class="tip-left" v-if="itemc.messageBody[0].type == TIM.TYPES.MSG_TEXT">{{itemc.messageBody[0].payload.text}}</div>
@@ -23,7 +23,7 @@
                         <el-row gutter="10" v-else-if = "itemc.messageBody[0].type !== 'TIMCustomElem'" type="flex" justify="end">
                             <div class="tip-right">{{messageContent(itemc)}}</div>
                             <el-col span="8">{{myname}}</el-col>
-                            <el-col span="4"><el-avatar shape="square" :size="50" :src="headOneUrl" /></el-col>
+                            <el-col span="4"><el-avatar shape="square" :size="50" :src="messageAvatar(itemc)" /></el-col>
                         </el-row>
                     </div>
         </el-dialog>
@@ -252,6 +252,10 @@ export default {
 
         messageKind(payload){
           return payload.type
+        },
+
+        messageAvatar(payload){
+          return payload.avatar
         },
 
         messageContent(payload){
