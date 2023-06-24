@@ -147,7 +147,7 @@ export default {
 
 .schedule-viewer .fc-daygrid-day-number {
     display: flex;
-    justify-content: end;
+    justify-content: flex-end;
     width: 100%;
     /* padding: 0px; */
 }
