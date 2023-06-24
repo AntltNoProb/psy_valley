@@ -12,14 +12,19 @@
             <el-icon><icon-menu /></el-icon>
             <span>首页</span>
         </el-menu-item>
-        <el-menu-item index="/working-schedule">
-            <el-icon><icon-menu /></el-icon>
-            <span>排班管理</span>
-        </el-menu-item>
         <el-menu-item index="/consult-record">
             <el-icon><icon-menu /></el-icon>
             <span>咨询记录</span>
         </el-menu-item>
+        <el-menu-item index="/working-schedule">
+            <el-icon><icon-menu /></el-icon>
+            <span>排班管理</span>
+        </el-menu-item>
+        <el-menu-item index="/dialog-record">
+            <el-icon><icon-menu /></el-icon>
+            <span>求助记录</span>
+        </el-menu-item>
+
         <el-menu-item index="/userspace">
             <el-icon><setting /></el-icon>
             <template #title>账户设置</template>
@@ -132,11 +137,11 @@ export default {
         console.log(event.data[0].from,'from=======');
         sessionStorage.setItem(event.data[0].from, JSON.stringify(message));
         console.log(sessionStorage.getItem(event.data[0].from),'assistSession===');
-
-        dialogVisible.value=true;
-        counselorusername.value = event.data[0].from;
-        counselorname.value=event.data[0].nick;
-        //router.push({path: 'solve', query:{'name': event.data[0].nick, 'username': event.data[0].from}});
+        if(event.data[0].payload.text != 'TERMINATE'){
+            dialogVisible.value=true;
+            counselorusername.value = event.data[0].from;
+            counselorname.value=event.data[0].nick;
+        }
       };
       //监听发送来的消息
       globaltim.on(TIM.EVENT.MESSAGE_RECEIVED, onMessageReceived);

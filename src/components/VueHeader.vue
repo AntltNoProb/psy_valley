@@ -25,6 +25,8 @@
 import {ArrowDown} from "@element-plus/icons";
 import circleURL from '@/assets/logo.png'
 import {globaltim} from "@/main";
+import request from "@/utils/request";
+import {ElMessage} from "element-plus";
 
 export default {
     name: "VueHeader",
@@ -46,13 +48,25 @@ export default {
     methods:{
         exit(){
             let promise = globaltim.logout();
-            promise.then(function(imResponse) {
-              console.log(imResponse.data); // 登出成功
-            }).catch(function(imError) {
-              console.warn('logout error:', imError);
+
+            request.get('user/exit', {
+                params:{
+                    username : this.user.username
+                }
+            }).then(res=>{
+                ElMessage({
+                    type: 'success',
+                    message: "成功退出",
+                })
+                console.log(res)
+                promise.then(function(imResponse) {
+                    console.log(imResponse.data); // 登出成功
+                }).catch(function(imError) {
+                    console.warn('logout error:', imError);
+                });
+                window.sessionStorage.clear();
+                this.$router.push('/login');
             });
-            window.sessionStorage.clear();
-            this.$router.push('/login');
         }
     }
 };

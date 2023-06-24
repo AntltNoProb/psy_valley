@@ -284,7 +284,7 @@ export default {
   height: 200px;
 }
 </style>
-<style>
+<style scoped>
 body {
     margin: 0;
     padding: 0;
@@ -294,7 +294,7 @@ body {
     margin: 20px;
     padding: 5px;
     width: 300px;
-    height: 60px;
+    min-height: 40px;
     border: 2px solid #f99;
     position: relative;
     background-color: #FFF;
@@ -302,6 +302,7 @@ body {
     -webkit-border-radius: 5px;
     -moz-border-radius: 5px;
     border-radius: 5px;
+    word-wrap: break-word;
 }
 
 .tip-left:before, .tip-left:after {
@@ -327,7 +328,7 @@ body {
     margin: 20px;
     padding: 5px;
     width: 300px;
-    height: 60px;
+    min-height: 40px;
     border: 2px solid #0ff;
     position: relative;
     background-color: #FFF;
@@ -335,6 +336,7 @@ body {
     -webkit-border-radius: 5px;
     -moz-border-radius: 5px;
     border-radius: 5px;
+    word-wrap: break-word;
 }
 
 .tip-right:before, .tip-right:after {
