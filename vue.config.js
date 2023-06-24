@@ -15,8 +15,7 @@ module.exports = {
         },
       },
       '/IM': {
-        target: 'https://console.tim.qq.com/v4/openim/admin_getroammsg', // 代理接口地址。实际请求接口地址会是：/api/xxx/xxx
-        //192.168.1.106
+        target: 'https://console.tim.qq.com/v4/openim/admin_getroammsg', // 代理接口地址
         changeOrigin: true, // 默认false，是否需要改变原始主机头为目标URL
         ws: true, //是否代理websockets
         pathRewrite: {

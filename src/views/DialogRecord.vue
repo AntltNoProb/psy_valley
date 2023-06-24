@@ -148,19 +148,59 @@ export default {
             return s;
         },
         load(){
-            request.get("/assist/list",{
-                params:{
-                    pageNum: this.currentPage,
-                    pageSize:10,
-                    counselorName: this.searchCounselor,
-                    startDate: this.param.startTime,
-                    endDate: this.param.endTime,
-                },
-            }).then(res => {
-                console.log(res,'textAssist')
-                this.tableData=res.data.assists
-                this.total = res.data.total
-            })
+
+            if(JSON.parse(sessionStorage.getItem('user')).authority == 'SystemManager'){
+                request.get("/assist/list",{
+                    params:{
+                        pageNum: this.currentPage,
+                        pageSize:10,
+                        counselorName: this.searchCounselor,
+                        startDate: this.param.startTime,
+                        endDate: this.param.endTime,
+                    },
+                }).then(res => {
+                    console.log(res,'textAssist')
+                    this.tableData=res.data.assists
+                    this.total = res.data.total
+                })
+            }else if(JSON.parse(sessionStorage.getItem('user')).authority == 'Counselor'){
+                let username = JSON.parse(sessionStorage.getItem('user')).username
+                request.get('/assist/counselorSeeList/'+ username,
+                {
+                    params:{
+                        pageNum: this.currentPage,
+                        pageSize:10,
+                        startDate: this.param.startTime,
+                        endDate: this.param.endTime,
+                    },
+                }).then(res => {
+                    console.log(res,'textAssist')
+                    this.tableData=res.data.assists
+                    this.total = res.data.total
+                })
+            }else if(JSON.parse(sessionStorage.getItem('user')).authority == 'Supervisor'){
+                let username = JSON.parse(sessionStorage.getItem('user')).username
+                request.get('/assist/bindList/'+ username,
+                    {
+                        params:{
+                            pageNum: this.currentPage,
+                            pageSize:10,
+                            counselorName: this.searchCounselor,
+                            startDate: this.param.startTime,
+                            endDate: this.param.endTime,
+                        },
+                    }).then(res => {
+                    console.log(res,'textAssist')
+                    this.tableData=res.data.assists
+                    this.total = res.data.total
+                })
+            }else{
+                ElMessage({
+                    type: 'error',
+                    message: '失败！',
+                })
+            }
+
         },
         handleDetail(myname,senderName,phoneNum,username,duration,startime){
             this.myname = myname
