@@ -153,7 +153,9 @@ export default {
         this.loadTotal();
         this.loadTimeStr();
         this.loadTodayCount();
+        // alert('hh')
     },
+
 }
 </script>
 <style>

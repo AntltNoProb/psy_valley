@@ -75,7 +75,7 @@ export default {
           console.warn('getMyProfile error:', imError); // 获取个人资料失败的相关信息
         });
       }
-      setTimeout(myAvatar, 800);
+      setTimeout(myAvatar, 1500);
       return{
         avatarUrl
       }
@@ -93,10 +93,6 @@ export default {
             type: Number,
             default: 0,
         },
-        // avatarUrl: {
-        //     type: String,
-        //     default: Head001,
-        // }
     },
     data() {
         return {

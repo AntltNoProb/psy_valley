@@ -68,8 +68,10 @@ export default {
     },
     methods: {
         loadConsultant(page, size) {
+
             const url = 'counselors/onlineList';
             const uurl = 'supervisors/counselorList/' + this.user.username;
+
             request.get(this.userBind?uurl:url, {
                 params: {
                     pageNum: page,
